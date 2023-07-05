@@ -1,0 +1,36 @@
+# global debug
+debug: false
+# for actuator
+management.endpoints.web.exposure.include: "*"
+
+logging:
+  level:
+    com.spring.projectboard: debug
+    org.springframework.web.servlet: debug # response, request debug 를 위한 설정
+    org.hibernate.type.descriptor.sql.BasicBinder: trace # jpa 사용시 query debug 를 위한 설정
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/board
+    username: joo
+    password: thisisTestpw!!
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    defer-datasource-initialization: true # test에 사용될 *.sql을 사용할 수 있게 함
+    hibernate.ddl-auto: create # 자동으로 DDL문을 작성하여 table을 생성
+    show-sql: true
+    properties:
+      hibernate.format_sql: true # formatting
+      hibernate.default_batch_fetch_size: 100 #
+  h2.console.enabled: false # default=false
+  sql.init.mode: always
+
+---
+
+spring:
+  config.activate.on-profile: testdb
+  datasource:
+    url: jdbc:h2:mem:board;mode=mysql
+    driver-class-name: org.h2.Driver
+  sql.init.mode: always
+  test.database.replace: none # mysql datasource를 사용할 건데 h2 in-memory가 자동으로 들어가기때문
