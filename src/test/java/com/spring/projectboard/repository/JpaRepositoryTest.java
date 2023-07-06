@@ -2,6 +2,7 @@ package com.spring.projectboard.repository;
 
 import com.spring.projectboard.config.JpaConfig;
 import com.spring.projectboard.domain.Article;
+import com.spring.projectboard.domain.UserAccount;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,12 +23,15 @@ import static org.assertj.core.api.Assertions.*;
 class JpaRepositoryTest {
     private final ArticleRepository articleRepository;
     private final ArticleCommentRepository articleCommentRepository;
+    private final UserAccountRepository userAccountRepository;
 
     public JpaRepositoryTest(
             @Autowired ArticleRepository articleRepository,
-            @Autowired ArticleCommentRepository articleCommentRepository) {
+            @Autowired ArticleCommentRepository articleCommentRepository,
+            @Autowired UserAccountRepository userAccountRepository) {
         this.articleRepository = articleRepository;
         this.articleCommentRepository = articleCommentRepository;
+        this.userAccountRepository = userAccountRepository;
     }
 
     @Test
@@ -46,10 +50,10 @@ class JpaRepositoryTest {
     void givenTestData_whenInserting_thenWorksFile() {
         // Given
         long previousCount = articleRepository.count();
-        Article article = Article.of("new article", "new content", "#spring");
-        Article savedArticle = articleRepository.save(article);
+        UserAccount userAccount = userAccountRepository.save(UserAccount.of("joo", "pw", null, null, null));
+        Article article = Article.of(userAccount, "new article", "new content", "#spring");
         // When
-        List<Article> articles = articleRepository.findAll();
+        articleRepository.save(article);
         // Then
         assertThat(articleRepository.count()).isEqualTo(previousCount + 1);
     }
