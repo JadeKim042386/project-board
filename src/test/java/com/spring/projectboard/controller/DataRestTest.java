@@ -76,4 +76,17 @@ public class DataRestTest {
                 .andExpect(content().contentType(MediaType.valueOf("application/hal+json")))
                 .andDo(print());
     }
+
+    @Test
+    @DisplayName("[api] 회원 관련 API는 제공되지 않음")
+    void requestUserAccounts() throws Exception {
+        // Given
+
+        // When
+        mvc.perform(get("/api/userAccounts")).andExpect(status().isNotFound());
+        mvc.perform(post("/api/userAccounts")).andExpect(status().isForbidden());
+        mvc.perform(put("/api/userAccounts")).andExpect(status().isForbidden());
+        mvc.perform(patch("/api/userAccounts")).andExpect(status().isForbidden());
+        mvc.perform(delete("/api/userAccounts")).andExpect(status().isForbidden());
+    }
 }

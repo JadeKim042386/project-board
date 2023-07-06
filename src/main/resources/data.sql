@@ -1124,3 +1124,6 @@ insert into article_comment (content, created_by, modified_by, created_at, modif
 insert into article_comment (content, created_by, modified_by, created_at, modified_at, article_id) values ('Aenean lectus.', 'Lucie', 'Devin', '2022-10-03 02:31:02', '2022-09-25 11:29:40', 45);
 insert into article_comment (content, created_by, modified_by, created_at, modified_at, article_id) values ('Morbi porttitor lorem id ligula.', 'Ferdy', 'Mariejeanne', '2022-07-11 16:50:09', '2022-12-28 22:56:30', 96);
 insert into article_comment (content, created_by, modified_by, created_at, modified_at, article_id) values ('Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec pharetra, magna vestibulum aliquet ultrices, erat tortor sollicitudin mi, sit amet lobortis sapien sapien non mi.', 'Athena', 'Bobbee', '2023-07-04 12:00:54', '2023-04-11 03:04:54', 43);
+
+--- 테스트 계정
+insert into user_account (user_id, user_password, nickname, email, memo, created_at, created_by, modified_at, modified_by) values ('joo', '1234asdf', 'Joo', 'jk042386@gmail.com', 'bulabula', now(), 'joo', now(), 'joo');
