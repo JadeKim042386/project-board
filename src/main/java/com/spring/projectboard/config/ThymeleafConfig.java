@@ -7,10 +7,8 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver;
-
 @Configuration
 public class ThymeleafConfig {
-
     @Bean
     public SpringResourceTemplateResolver thymeleafTemplateResolver(
             SpringResourceTemplateResolver defaultTemplateResolver,
@@ -20,8 +18,6 @@ public class ThymeleafConfig {
 
         return defaultTemplateResolver;
     }
-
-
     @RequiredArgsConstructor
     @Getter
     @ConstructorBinding
@@ -32,5 +28,4 @@ public class ThymeleafConfig {
          */
         private final boolean decoupledLogic;
     }
-
 }
