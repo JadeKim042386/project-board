@@ -1,3 +1,6 @@
+--- 테스트 계정
+insert into user_account (user_id, user_password, nickname, email, memo, created_at, created_by, modified_at, modified_by) values ('joo', '1234asdf', 'Joo', 'jk042386@gmail.com', 'bulabula', now(), 'joo', now(), 'joo');
+
 --- 게시글 123개
 insert into article (user_account_id, title, content, hashtag, created_by, modified_by, created_at, modified_at) values
 (1, 'Nulla tellus.', 'Praesent id massa id nisl venenatis lacinia. Aenean sit amet justo. Morbi ut odio.', null, 'Freeman', 'Cello', '2022-07-31 16:44:54', '2023-04-08 02:08:30'),
@@ -1126,6 +1129,3 @@ insert into article_comment (user_account_id, content, created_by, modified_by, 
 (1, 'Aenean lectus.', 'Lucie', 'Devin', '2022-10-03 02:31:02', '2022-09-25 11:29:40', 45),
 (1, 'Morbi porttitor lorem id ligula.', 'Ferdy', 'Mariejeanne', '2022-07-11 16:50:09', '2022-12-28 22:56:30', 96),
 (1, 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec pharetra, magna vestibulum aliquet ultrices, erat tortor sollicitudin mi, sit amet lobortis sapien sapien non mi.', 'Athena', 'Bobbee', '2023-07-04 12:00:54', '2023-04-11 03:04:54', 43);
-
---- 테스트 계정
-insert into user_account (user_id, user_password, nickname, email, memo, created_at, created_by, modified_at, modified_by) values (1, 'joo', '1234asdf', 'Joo', 'jk042386@gmail.com', 'bulabula', now(), 'joo', now(), 'joo');
