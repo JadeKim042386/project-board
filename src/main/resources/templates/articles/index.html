@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>게시판 페이지</title>
 </head>
 <body>
-<!--    헤더-->
-    <header>
+    <!--헤더-->
+    <header th:replace="header :: header">
         헤더 삽입부
         <hr>
     </header>
-<!--    메인 페이지 - 테이블-->
+    <!--메인 페이지 - 테이블-->
     <main>
         <form>
             <label for="search-type" hidden>유형</label>
@@ -25,6 +25,7 @@
             <input id="search-value" type="search" placeholder="검색어..." name="search-value">
             <button type="submit">검색</button>
         </form>
+
         <table>
             <thead>
                 <tr>
@@ -55,6 +56,7 @@
                 </tr>
             </tbody>
         </table>
+
         <nav>
             <table>
                 <tr>
@@ -68,8 +70,8 @@
             </table>
         </nav>
     </main>
-<!--    푸터-->
-    <footer>
+    <!--푸터-->
+    <footer th:replace="footer :: footer">
         <hr>
         푸터 삽입부
     </footer>
