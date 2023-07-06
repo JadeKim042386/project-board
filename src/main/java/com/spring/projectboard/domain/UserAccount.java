@@ -1,0 +1,57 @@
+package com.spring.projectboard.domain;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import org.apache.catalina.User;
+
+import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.util.Objects;
+
+@Getter
+@ToString
+@Table(indexes = {
+        @Index(columnList = "userId"),
+        @Index(columnList = "email", unique = true),
+        @Index(columnList = "memo"),
+        @Index(columnList = "createdAt"),
+        @Index(columnList = "createdBy")
+})
+@Entity
+public class UserAccount extends AuditingFields{
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Setter @Column(nullable = false, length = 50) private String userId;
+    @Setter @Column(nullable = false, length = 255) private String userPassword;
+
+    @Setter @Column(nullable = false, length = 100) private String email;
+    @Setter @Column(nullable = false, length = 100) private String nickname;
+    @Setter @Column(length = 255) private String memo;
+
+    protected UserAccount() {
+    }
+
+    private UserAccount(String userId, String user_password, String email, String nickname, String memo) {
+        this.email = email;
+        this.nickname = nickname;
+        this.memo = memo;
+    }
+
+    public UserAccount of(String userId, String user_password, String email, String nickname, String memo) {
+        return new UserAccount(userId, user_password, email, nickname, memo);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UserAccount that)) return false;
+        return id != null && Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+}
