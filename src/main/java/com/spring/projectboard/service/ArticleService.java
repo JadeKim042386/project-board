@@ -20,10 +20,12 @@ import java.util.List;
 public class ArticleService {
     private final ArticleRepository articleRepository;
 
+    @Transactional(readOnly = true)
     public List<Article> searchArticles(SearchType searchType, String title, Pageable pageable) {
         return List.of();
     }
 
+    @Transactional(readOnly = true)
     public ArticleWithCommentsDto getArticle(Long articleId) {
         return null;
     }
@@ -32,5 +34,8 @@ public class ArticleService {
     }
 
     public void updateArticle(ArticleDto articleDto) {
+    }
+
+    public void deleteArticle(Long articleId) {
     }
 }

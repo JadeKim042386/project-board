@@ -6,18 +6,14 @@ import com.spring.projectboard.domain.constant.SearchType;
 import com.spring.projectboard.dto.ArticleDto;
 import com.spring.projectboard.dto.ArticleWithCommentsDto;
 import com.spring.projectboard.repository.ArticleRepository;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
@@ -89,7 +85,7 @@ class ArticleServiceTest {
         then(articleRepository).should().findById(article_id);
     }
 
-    @DisplayName("게시글 생성")
+    @DisplayName("게시글 저장")
     @Test
     void saveArticle() {
         // Given
@@ -118,7 +114,7 @@ class ArticleServiceTest {
         then(articleRepository).should().getReferenceById(articleDto.id());
     }
 
-    @DisplayName("없는 게시글 수정")
+    @DisplayName("[예외] 없는 게시글 수정")
     @Test
     void updateNotExistArticle() {
         // Given
@@ -128,6 +124,18 @@ class ArticleServiceTest {
         sut.updateArticle(articleDto);
         // Then
         then(articleRepository).should().getReferenceById(articleDto.id());
+    }
+
+    @DisplayName("게시글 삭제")
+    @Test
+    void deleteArticle() {
+        // Given
+        Long article_id = 1L;
+        willDoNothing().given(articleRepository).deleteById(article_id);
+        // When
+        sut.deleteArticle(article_id);
+        // Then
+        then(articleRepository).should().deleteById(article_id);
     }
 
     private Article createArticle() {
