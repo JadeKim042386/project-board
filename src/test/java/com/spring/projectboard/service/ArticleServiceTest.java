@@ -38,7 +38,7 @@ class ArticleServiceTest {
         Pageable pageable = Pageable.ofSize(20);
         given(articleRepository.findByTitle(keyword, pageable)).willReturn(Page.empty());
         // When
-        List<Article> articles = sut.searchArticles(SearchType.TITLE, keyword, pageable);
+        Page<ArticleDto> articles = sut.searchArticles(SearchType.TITLE, keyword, pageable);
         // Then
         assertThat(articles).isEmpty();
         then(articleRepository).should().findByTitle(keyword, pageable);
@@ -51,7 +51,7 @@ class ArticleServiceTest {
         Pageable pageable = Pageable.ofSize(20);
         given(articleRepository.findAll(pageable)).willReturn(Page.empty());
         // When
-        List<Article> articles = sut.searchArticles(null, null, pageable);
+        Page<ArticleDto> articles = sut.searchArticles(null, null, pageable);
         // Then
         assertThat(articles).isEmpty();
         then(articleRepository).should().findAll(pageable);
