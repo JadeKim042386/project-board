@@ -10,7 +10,7 @@ public record ArticleWithCommentsDto(
         String title,
         String content,
         String hashtag,
-        UserAccount userAccount,
+        UserAccountDto userAccountDto,
         Set<ArticleCommentDto> articleCommentDtos,
         LocalDateTime createdAt,
         String createdBy,
@@ -18,7 +18,7 @@ public record ArticleWithCommentsDto(
         String modifiedBy
 
 ) {
-    public static ArticleWithCommentsDto of(Long id, String title, String content, String hashtag, UserAccount userAccount, Set<ArticleCommentDto> articleCommentDtos, LocalDateTime createdAt, String createdBy, LocalDateTime modifiedAt, String modifiedBy) {
-        return new ArticleWithCommentsDto(id, title, content, hashtag, userAccount, articleCommentDtos, createdAt, createdBy, modifiedAt, modifiedBy);
+    public static ArticleWithCommentsDto of(Long id, String title, String content, String hashtag, UserAccountDto userAccountDto, Set<ArticleCommentDto> articleCommentDtos, LocalDateTime createdAt, String createdBy, LocalDateTime modifiedAt, String modifiedBy) {
+        return new ArticleWithCommentsDto(id, title, content, hashtag, userAccountDto, articleCommentDtos, createdAt, createdBy, modifiedAt, modifiedBy);
     }
 }
