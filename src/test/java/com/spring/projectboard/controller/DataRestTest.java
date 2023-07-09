@@ -82,9 +82,9 @@ public class DataRestTest {
 
         // When
         mvc.perform(get("/api/userAccounts")).andExpect(status().isNotFound());
-        mvc.perform(post("/api/userAccounts")).andExpect(status().isForbidden());
-        mvc.perform(put("/api/userAccounts")).andExpect(status().isForbidden());
-        mvc.perform(patch("/api/userAccounts")).andExpect(status().isForbidden());
-        mvc.perform(delete("/api/userAccounts")).andExpect(status().isForbidden());
+        mvc.perform(post("/api/userAccounts")).andExpect(status().isNotFound());
+        mvc.perform(put("/api/userAccounts")).andExpect(status().isNotFound());
+        mvc.perform(patch("/api/userAccounts")).andExpect(status().isNotFound());
+        mvc.perform(delete("/api/userAccounts")).andExpect(status().isNotFound());
     }
 }
