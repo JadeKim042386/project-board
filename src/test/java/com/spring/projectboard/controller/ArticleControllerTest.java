@@ -3,6 +3,7 @@ package com.spring.projectboard.controller;
 import com.spring.projectboard.config.SecurityConfig;
 import com.spring.projectboard.domain.UserAccount;
 import com.spring.projectboard.dto.ArticleWithCommentsDto;
+import com.spring.projectboard.dto.UserAccountDto;
 import com.spring.projectboard.service.ArticleService;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -102,7 +103,7 @@ class ArticleControllerTest {
                 "title",
                 "content",
                 "hashtag",
-                createUserAccount(),
+                createUserAccountDto(),
                 Set.of(),
                 LocalDateTime.now(),
                 "joo",
@@ -111,13 +112,18 @@ class ArticleControllerTest {
         );
     }
 
-    private UserAccount createUserAccount() {
-        return UserAccount.of(
+    private UserAccountDto createUserAccountDto() {
+        return UserAccountDto.of(
+                1L,
                 "joo",
                 "pw",
                 "joo@gmail.com",
                 "joo",
-                "memo"
+                "memo",
+                LocalDateTime.now(),
+                "joo",
+                LocalDateTime.now(),
+                "joo"
         );
     }
 }
