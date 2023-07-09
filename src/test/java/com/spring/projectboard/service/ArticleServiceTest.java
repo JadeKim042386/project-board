@@ -5,6 +5,7 @@ import com.spring.projectboard.domain.UserAccount;
 import com.spring.projectboard.domain.constant.SearchType;
 import com.spring.projectboard.dto.ArticleDto;
 import com.spring.projectboard.dto.ArticleWithCommentsDto;
+import com.spring.projectboard.dto.UserAccountDto;
 import com.spring.projectboard.repository.ArticleRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,6 @@ import org.springframework.data.domain.Pageable;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,12 +36,12 @@ class ArticleServiceTest {
         // Given
         String keyword = "title";
         Pageable pageable = Pageable.ofSize(20);
-        given(articleRepository.findByTitle(keyword, pageable)).willReturn(Page.empty());
+        given(articleRepository.findByTitleContaining(keyword, pageable)).willReturn(Page.empty());
         // When
         Page<ArticleDto> articles = sut.searchArticles(SearchType.TITLE, keyword, pageable);
         // Then
         assertThat(articles).isEmpty();
-        then(articleRepository).should().findByTitle(keyword, pageable);
+        then(articleRepository).should().findByTitleContaining(keyword, pageable);
     }
 
     @DisplayName("검색어 없이 게시글 페이지 반환")
@@ -164,10 +164,25 @@ class ArticleServiceTest {
     private ArticleDto createArticleDto(String title, String content, String hashtag) {
         return ArticleDto.of(
                 1L,
-                createUserAccount(),
+                createUserAccountDto(),
                 title,
                 content,
                 hashtag,
+                LocalDateTime.now(),
+                "joo",
+                LocalDateTime.now(),
+                "joo"
+        );
+    }
+
+    private UserAccountDto createUserAccountDto() {
+        return UserAccountDto.of(
+                1L,
+                "joo",
+                "pw",
+                "joo@gmail.com",
+                "joo",
+                "memo",
                 LocalDateTime.now(),
                 "joo",
                 LocalDateTime.now(),

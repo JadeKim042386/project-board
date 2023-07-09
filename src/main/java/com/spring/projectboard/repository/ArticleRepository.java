@@ -30,5 +30,13 @@ public interface ArticleRepository extends
         bindings.bind(root.createdBy).first(StringExpression::containsIgnoreCase);
     }
 
-    Page<Article> findByTitle(String keyword, Pageable pageable);
+    Page<Article> findByTitleContaining(String keyword, Pageable pageable);
+
+    Page<Article> findByContentContaining(String searchKeyword, Pageable pageable);
+
+    Page<Article> findByUserAccount_UserIdContaining(String searchKeyword, Pageable pageable);
+
+    Page<Article> findByUserAccount_NicknameContaining(String searchKeyword, Pageable pageable);
+
+    Page<Article> findByHashtag(String s, Pageable pageable);
 }
