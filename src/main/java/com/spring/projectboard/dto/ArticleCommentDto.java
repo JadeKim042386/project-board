@@ -1,5 +1,6 @@
 package com.spring.projectboard.dto;
 
+import com.spring.projectboard.domain.Article;
 import com.spring.projectboard.domain.ArticleComment;
 
 import java.time.LocalDateTime;
@@ -28,6 +29,14 @@ public record ArticleCommentDto(
                 articleComment.getCreatedBy(),
                 articleComment.getModifiedAt(),
                 articleComment.getModifiedBy()
+        );
+    }
+
+    public ArticleComment toEntity(Article article) {
+        return ArticleComment.of(
+                userAccountDto.toEntity(),
+                article,
+                content
         );
     }
 }
