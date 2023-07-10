@@ -45,6 +45,7 @@ public class ArticleController {
 
         model.addAttribute("articles", articles);
         model.addAttribute("paginationBarNumbers", barNumbers);
+        model.addAttribute("searchTypes", SearchType.values());
 
         return "articles/index";
     }
