@@ -48,12 +48,12 @@ public class ArticleService {
         try {
             Article article = articleRepository.getReferenceById(articleDto.id());
             if (articleDto.title() != null) {
-                article.setTitle(article.getTitle());
+                article.setTitle(articleDto.title());
             }
             if (articleDto.content() != null) {
-                article.setContent(article.getContent());
+                article.setContent(articleDto.content());
             }
-            article.setHashtag(article.getHashtag());
+            article.setHashtag(articleDto.hashtag());
         } catch (EntityNotFoundException e) {
             log.warn("게시글 업데이트 실패! 게시글을 찾을 수 없습니다 - ArticleDTO: {}", articleDto);
         }

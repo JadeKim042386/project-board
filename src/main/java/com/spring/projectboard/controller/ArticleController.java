@@ -47,7 +47,7 @@ public class ArticleController {
             Model model) {
         ArticleWithCommentResponse article = ArticleWithCommentResponse.from(articleService.getArticle(articleId));
 
-        model.addAttribute("article", article); // TODO: 살제 데이터 필요
+        model.addAttribute("article", article);
         model.addAttribute("articleComments", article.articleCommentResponses());
         return "articles/detail";
     }
