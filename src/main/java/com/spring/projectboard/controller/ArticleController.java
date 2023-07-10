@@ -5,8 +5,10 @@ import com.spring.projectboard.dto.ArticleWithCommentsDto;
 import com.spring.projectboard.dto.response.ArticleResponse;
 import com.spring.projectboard.dto.response.ArticleWithCommentResponse;
 import com.spring.projectboard.service.ArticleService;
+import com.spring.projectboard.service.PaginationService;
 import io.micrometer.core.instrument.search.Search;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -31,13 +33,19 @@ import java.util.List;
 @Controller
 public class ArticleController {
     private final ArticleService articleService;
+    private final PaginationService paginationService;
     @GetMapping
     public String articles(
             @RequestParam(required = false) SearchType searchType,
             @RequestParam(required = false) String searchValue,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             Model model) {
-        model.addAttribute("articles", articleService.searchArticles(searchType, searchValue, pageable).map(ArticleResponse::from));
+        Page<ArticleResponse> articles = articleService.searchArticles(searchType, searchValue, pageable).map(ArticleResponse::from);
+        List<Integer> barNumbers = paginationService.getPaginationBarNumbers(pageable.getPageNumber(), articles.getTotalPages());
+
+        model.addAttribute("articles", articles);
+        model.addAttribute("paginationBarNumbers", barNumbers);
+
         return "articles/index";
     }
 
