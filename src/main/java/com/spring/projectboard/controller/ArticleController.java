@@ -57,6 +57,7 @@ public class ArticleController {
 
         model.addAttribute("article", article);
         model.addAttribute("articleComments", article.articleCommentResponses());
+        model.addAttribute("totalCount", articleService.getArticleCount());
         return "articles/detail";
     }
 }
