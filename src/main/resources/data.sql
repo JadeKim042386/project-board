@@ -1,12 +1,13 @@
 --- 테스트 계정
 insert into user_account (user_id, user_password, nickname, email, memo, created_at, created_by, modified_at, modified_by) values ('joo', '1234asdf', 'Joo', 'jk042386@gmail.com', 'bulabula', now(), 'joo', now(), 'joo');
+insert into user_account (user_id, user_password, nickname, email, memo, created_at, created_by, modified_at, modified_by) values ('a', '1234asdf', 'A', 'a@gmail.com', 'bulabula', now(), 'a', now(), 'a');
 
 --- 게시글 123개
 insert into article (user_account_id, title, content, hashtag, created_by, modified_by, created_at, modified_at) values
-(1, 'Nulla tellus.', 'Praesent id massa id nisl venenatis lacinia. Aenean sit amet justo. Morbi ut odio.', null, 'Freeman', 'Cello', '2022-07-31 16:44:54', '2023-04-08 02:08:30'),
-(1, 'In hac habitasse platea dictumst.', 'Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem.', 'Khaki', 'Constancy', 'Marcelline', '2022-11-26 00:54:49', '2023-02-20 13:54:20'),
-(1, 'Suspendisse potenti.', 'Proin interdum mauris non ligula pellentesque ultrices. Phasellus id sapien in sapien iaculis congue. Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl.', 'Crimson', 'Chelsae', 'Jeanne', '2023-04-07 04:38:05', '2022-09-30 19:33:39'),
-(1, 'Curabitur convallis.', 'Nullam porttitor lacus at turpis. Donec posuere metus vitae ipsum. Aliquam non mauris.', null, 'Lucila', 'Ferguson', '2023-06-03 02:26:48', '2023-03-12 21:17:22'),
+(2, 'Nulla tellus.', 'Praesent id massa id nisl venenatis lacinia. Aenean sit amet justo. Morbi ut odio.', null, 'Freeman', 'Cello', '2022-07-31 16:44:54', '2023-04-08 02:08:30'),
+(2, 'In hac habitasse platea dictumst.', 'Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem.', 'Khaki', 'Constancy', 'Marcelline', '2022-11-26 00:54:49', '2023-02-20 13:54:20'),
+(2, 'Suspendisse potenti.', 'Proin interdum mauris non ligula pellentesque ultrices. Phasellus id sapien in sapien iaculis congue. Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl.', 'Crimson', 'Chelsae', 'Jeanne', '2023-04-07 04:38:05', '2022-09-30 19:33:39'),
+(2, 'Curabitur convallis.', 'Nullam porttitor lacus at turpis. Donec posuere metus vitae ipsum. Aliquam non mauris.', null, 'Lucila', 'Ferguson', '2023-06-03 02:26:48', '2023-03-12 21:17:22'),
 (1, 'Donec vitae nisi.', 'Sed ante. Vivamus tortor. Duis mattis egestas metus.', 'Mauv', 'Rachel', 'Jenn', '2022-10-09 11:16:22', '2022-08-25 21:38:55'),
 (1, 'Maecenas ut massa quis augue luctus tincidunt.', 'Aenean lectus. Pellentesque eget nunc. Donec quis orci eget orci vehicula condimentum.', 'Orange', 'Kora', 'Husein', '2022-07-23 21:49:49', '2022-12-15 06:47:39'),
 (1, 'Aliquam augue quam, sollicitudin vitae, consectetuer eget, rutrum at, lorem.', 'Nulla ut erat id mauris vulputate elementum. Nullam varius. Nulla facilisi.', 'Pink', 'Cortie', 'Cirstoforo', '2023-03-15 08:03:31', '2023-05-16 23:36:20'),
