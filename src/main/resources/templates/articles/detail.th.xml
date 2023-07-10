@@ -17,7 +17,7 @@
     <attr sel="#article-comments" th:remove="all-but-first">
         <attr sel="li[0]" th:each="articleComment : ${articleComments}">
             <attr sel="div/strong" th:text="${articleComment.nickname}" />
-            <attr sel="div/small/time" th:datetime="${articleComment.createdAt}" th:text="*{#temporals.format(articleComment.createdAt, 'yyyy-MM-dd HH:mm:ss')}" />
+            <attr sel="div/small/time" th:datetime="${articleComment.createdAt}" th:text="${#temporals.format(articleComment.createdAt, 'yyyy-MM-dd HH:mm:ss')}" />
             <attr sel="div/p" th:text="${articleComment.content}" />
         </attr>
     </attr>
