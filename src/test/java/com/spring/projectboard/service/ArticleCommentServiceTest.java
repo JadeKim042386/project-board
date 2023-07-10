@@ -127,6 +127,7 @@ class ArticleCommentServiceTest {
         return UserAccountDto.of(
                 1L,
                 "joo",
+                "pw",
                 "joo@mail.com",
                 "joo",
                 "momo",
