@@ -121,7 +121,7 @@ class ArticleControllerTest {
         then(paginationService).should().getPaginationBarNumbers(pageable.getPageNumber(), Page.empty().getTotalPages());
     }
 
-    @DisplayName("[view] [GET] 게시글 페이지- 정상 호출")
+    @DisplayName("[view] [GET] 게시글 페이지 - 정상 호출")
     @Test
     public void requestArticleView() throws Exception {
         // Given

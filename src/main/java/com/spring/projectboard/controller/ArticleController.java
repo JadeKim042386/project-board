@@ -30,7 +30,7 @@ import java.util.List;
  * /articles/search-hashtag
  */
 @RequiredArgsConstructor
-@RequestMapping("articles")
+@RequestMapping("/articles")
 @Controller
 public class ArticleController {
     private final ArticleService articleService;
