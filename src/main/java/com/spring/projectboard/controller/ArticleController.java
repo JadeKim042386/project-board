@@ -30,7 +30,7 @@ import java.util.List;
  * /articles/search-hashtag
  */
 @RequiredArgsConstructor
-@RequestMapping("articles")
+@RequestMapping("/articles")
 @Controller
 public class ArticleController {
     private final ArticleService articleService;
@@ -96,11 +96,7 @@ public class ArticleController {
                                 "pw",
                                 "joo@gmail.com",
                                 "Joo",
-                                "memo",
-                                null,
-                                null,
-                                null,
-                                null)
+                                "memo")
                 )
         );
         return "redirect:/articles";
@@ -127,11 +123,7 @@ public class ArticleController {
                                 "pw",
                                 "joo@gmail.com",
                                 "Joo",
-                                "memo",
-                                null,
-                                null,
-                                null,
-                                null)
+                                "memo")
                 )
         );
         return "redirect:/articles/" + articleId;

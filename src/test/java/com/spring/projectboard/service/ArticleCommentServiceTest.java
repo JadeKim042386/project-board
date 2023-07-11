@@ -7,6 +7,7 @@ import com.spring.projectboard.dto.ArticleCommentDto;
 import com.spring.projectboard.dto.UserAccountDto;
 import com.spring.projectboard.repository.ArticleCommentRepository;
 import com.spring.projectboard.repository.ArticleRepository;
+import com.spring.projectboard.repository.UserAccountRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,6 +28,7 @@ class ArticleCommentServiceTest {
     @InjectMocks private ArticleCommentService sut;
     @Mock private ArticleRepository articleRepository;
     @Mock private ArticleCommentRepository articleCommentRepository;
+    @Mock private UserAccountRepository userAccountRepository;
 
     @DisplayName("게시글 ID로 댓글 조회")
     @Test
@@ -52,11 +54,13 @@ class ArticleCommentServiceTest {
         ArticleCommentDto dto = createCommentDto("content");
         given(articleRepository.getReferenceById(dto.articleId())).willReturn(createArticle());
         given(articleCommentRepository.save(any(ArticleComment.class))).willReturn(createComment("content"));
+        given(userAccountRepository.getReferenceById(dto.userAccountDto().userId())).willReturn(createUserAccount());
         // When
         sut.saveComment(dto);
         // Then
         then(articleRepository).should().getReferenceById(dto.articleId());
         then(articleCommentRepository).should().save(any(ArticleComment.class));
+        then(userAccountRepository).should().getReferenceById(dto.userAccountDto().userId());
     }
 
     @DisplayName("[예외] 존재하지 않는 게시글에 댓글 저장")
@@ -70,6 +74,7 @@ class ArticleCommentServiceTest {
         // Then
         then(articleRepository).should().getReferenceById(dto.articleId());
         then(articleCommentRepository).shouldHaveNoInteractions();
+        then(userAccountRepository).shouldHaveNoInteractions();
     }
 
     @DisplayName("댓글 수정")
