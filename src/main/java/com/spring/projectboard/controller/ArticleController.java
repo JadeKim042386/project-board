@@ -1,24 +1,21 @@
 package com.spring.projectboard.controller;
 
-import com.spring.projectboard.domain.Article;
 import com.spring.projectboard.domain.constant.FormStatus;
 import com.spring.projectboard.domain.constant.SearchType;
-import com.spring.projectboard.dto.ArticleWithCommentsDto;
-import com.spring.projectboard.dto.UserAccountDto;
 import com.spring.projectboard.dto.response.ArticleResponse;
 import com.spring.projectboard.dto.response.ArticleWithCommentResponse;
+import com.spring.projectboard.dto.security.BoardPrincipal;
 import com.spring.projectboard.request.ArticleRequest;
 import com.spring.projectboard.service.ArticleService;
 import com.spring.projectboard.service.PaginationService;
-import io.micrometer.core.instrument.search.Search;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -87,16 +84,12 @@ public class ArticleController {
     }
 
     @PostMapping("/form")
-    public String postNewArticle(ArticleRequest articleRequest) {
-        //TODO: 인증 정보 추가
+    public String postNewArticle(
+            ArticleRequest articleRequest,
+            @AuthenticationPrincipal BoardPrincipal boardPrincipal) {
         articleService.saveArticle(
                 articleRequest.toDto(
-                        UserAccountDto.of(
-                                "joo",
-                                "pw",
-                                "joo@gmail.com",
-                                "Joo",
-                                "memo")
+                        boardPrincipal.toDto()
                 )
         );
         return "redirect:/articles";
@@ -113,26 +106,24 @@ public class ArticleController {
     }
 
     @PostMapping("/{articleId}/form")
-    public String postUpdateArticle(@PathVariable Long articleId, ArticleRequest articleRequest) {
-        //TODO: 인증 정보 추가
+    public String postUpdateArticle(
+            @PathVariable Long articleId,
+            ArticleRequest articleRequest,
+            @AuthenticationPrincipal BoardPrincipal boardPrincipal) {
         articleService.updateArticle(
                 articleId,
                 articleRequest.toDto(
-                        UserAccountDto.of(
-                                "joo",
-                                "pw",
-                                "joo@gmail.com",
-                                "Joo",
-                                "memo")
+                        boardPrincipal.toDto()
                 )
         );
         return "redirect:/articles/" + articleId;
     }
 
     @PostMapping("{articleId}/delete")
-    public String deleteArticle(@PathVariable Long articleId) {
-        //TODO: 인증 정보 추가
-        articleService.deleteArticle(articleId);
+    public String deleteArticle(
+            @PathVariable Long articleId,
+            @AuthenticationPrincipal BoardPrincipal boardPrincipal) {
+        articleService.deleteArticle(articleId, boardPrincipal.getUsername());
         return "redirect:/articles";
     }
 }
