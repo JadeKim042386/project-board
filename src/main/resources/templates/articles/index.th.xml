@@ -4,6 +4,7 @@
     <attr sel="#footer" th:replace="footer :: footer"></attr>
 
     <attr sel="main" th:object="${articles}">
+        <attr sel="#search-form" th:action="@{/articles}" th:method="get" />
         <attr sel="#search-type" th:remove="all-but-first">
             <attr sel="option[0]"
                   th:each="searchType : ${searchTypes}"
@@ -40,7 +41,8 @@
                 </attr>
             </attr>
         </attr>
-            <attr sel="#pagination">
+        <attr sel="#write-article" th:href="@{/articles/form}" />
+        <attr sel="#pagination">
             <attr sel="li[0]/a"
                   th:text="'Previous'"
                   th:href="@{/articles(page=${articles.number - 1}, searchType=${param.searchType}, searchValue=${param.searchValue})}"
