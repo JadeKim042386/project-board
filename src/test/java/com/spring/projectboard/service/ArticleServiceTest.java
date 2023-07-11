@@ -7,6 +7,7 @@ import com.spring.projectboard.dto.ArticleDto;
 import com.spring.projectboard.dto.ArticleWithCommentsDto;
 import com.spring.projectboard.dto.UserAccountDto;
 import com.spring.projectboard.repository.ArticleRepository;
+import com.spring.projectboard.repository.UserAccountRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
@@ -30,6 +32,7 @@ import static org.mockito.BDDMockito.*;
 class ArticleServiceTest {
     @InjectMocks private ArticleService sut; //system under test
     @Mock private ArticleRepository articleRepository;
+    @Mock private UserAccountRepository userAccountRepository;
 
     @DisplayName("검색어로 게시글 페이지 반환")
     @Test
@@ -98,6 +101,36 @@ class ArticleServiceTest {
         then(articleRepository).should().findAllDistinctHashtags();
     }
 
+    @DisplayName("ID로 댓글 달린 게시글 조회")
+    @Test
+    void findArticleWithComments() {
+        // Given
+        Long articleId = 1L;
+        Article article = createArticle();
+        given(articleRepository.findById(articleId)).willReturn(Optional.of(article));
+        // When
+        ArticleWithCommentsDto dto = sut.getArticleWithComments(articleId);
+        // Then
+        assertThat(dto)
+                .hasFieldOrPropertyWithValue("title", article.getTitle())
+                .hasFieldOrPropertyWithValue("content", article.getContent())
+                .hasFieldOrPropertyWithValue("hashtag", article.getHashtag());
+        then(articleRepository).should().findById(articleId);
+    }
+
+    @DisplayName("[예외] ID로 존재하지 않는 댓글 달린 게시글 조회")
+    @Test
+    void findNotExistArticleWithComments() {
+        // Given
+        Long articleId = 0L;
+        given(articleRepository.findById(articleId)).willReturn(Optional.empty());
+        // When
+
+        // Then
+        assertThatThrownBy(() -> sut.getArticleWithComments(articleId)).isInstanceOf(EntityNotFoundException.class);
+        then(articleRepository).should().findById(articleId);
+    }
+
     @DisplayName("ID로 게시글 조회")
     @Test
     void findArticle() {
@@ -106,7 +139,7 @@ class ArticleServiceTest {
         Article article = createArticle();
         given(articleRepository.findById(article_id)).willReturn(Optional.of(article));
         // When
-        ArticleWithCommentsDto dto = sut.getArticle(article_id);
+        ArticleDto dto = sut.getArticle(article_id);
         // Then
         assertThat(dto)
                 .hasFieldOrPropertyWithValue("title", article.getTitle())
@@ -131,10 +164,12 @@ class ArticleServiceTest {
     void saveArticle() {
         // Given
         ArticleDto dto = createArticleDto();
+        given(userAccountRepository.getReferenceById(dto.userAccountDto().userId())).willReturn(createUserAccount());
         given(articleRepository.save(any(Article.class))).willReturn(createArticle());
         // When
         sut.saveArticle(dto);
         // Then
+        then(userAccountRepository).should().getReferenceById(dto.userAccountDto().userId());
         then(articleRepository).should().save(any(Article.class));
     }
 
@@ -146,7 +181,7 @@ class ArticleServiceTest {
         ArticleDto articleDto = createArticleDto("new title", "new content", "new hashtag");
         given(articleRepository.getReferenceById(articleDto.id())).willReturn(article);
         // When
-        sut.updateArticle(articleDto);
+        sut.updateArticle(articleDto.id(), articleDto);
         // Then
         assertThat(article)
                 .hasFieldOrPropertyWithValue("title", articleDto.title())
@@ -162,7 +197,7 @@ class ArticleServiceTest {
         ArticleDto articleDto = createArticleDto("new title", "new content", "new hashtag");
         given(articleRepository.getReferenceById(articleDto.id())).willThrow(EntityNotFoundException.class);
         // When
-        sut.updateArticle(articleDto);
+        sut.updateArticle(articleDto.id(), articleDto);
         // Then
         then(articleRepository).should().getReferenceById(articleDto.id());
     }
@@ -193,12 +228,14 @@ class ArticleServiceTest {
     }
 
     private Article createArticle() {
-        return Article.of(
+        Article article = Article.of(
                 createUserAccount(),
                 "title",
                 "content",
                 "hashtag"
         );
+        ReflectionTestUtils.setField(article, "id", 1L);
+        return article;
     }
 
     private UserAccount createUserAccount() {

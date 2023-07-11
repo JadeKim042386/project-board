@@ -1,9 +1,13 @@
 package com.spring.projectboard.controller;
 
+import com.spring.projectboard.domain.Article;
+import com.spring.projectboard.domain.constant.FormStatus;
 import com.spring.projectboard.domain.constant.SearchType;
 import com.spring.projectboard.dto.ArticleWithCommentsDto;
+import com.spring.projectboard.dto.UserAccountDto;
 import com.spring.projectboard.dto.response.ArticleResponse;
 import com.spring.projectboard.dto.response.ArticleWithCommentResponse;
+import com.spring.projectboard.request.ArticleRequest;
 import com.spring.projectboard.service.ArticleService;
 import com.spring.projectboard.service.PaginationService;
 import io.micrometer.core.instrument.search.Search;
@@ -15,10 +19,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -54,7 +55,7 @@ public class ArticleController {
     public String article(
             @PathVariable Long articleId,
             Model model) {
-        ArticleWithCommentResponse article = ArticleWithCommentResponse.from(articleService.getArticle(articleId));
+        ArticleWithCommentResponse article = ArticleWithCommentResponse.from(articleService.getArticleWithComments(articleId));
 
         model.addAttribute("article", article);
         model.addAttribute("articleComments", article.articleCommentResponses());
@@ -77,5 +78,69 @@ public class ArticleController {
         model.addAttribute("searchType", SearchType.HASHTAG);
 
         return "articles/search-hashtag";
+    }
+
+    @GetMapping("/form")
+    public String articleForm(Model model) {
+        model.addAttribute("formStatus", FormStatus.CREATE);
+        return "articles/form";
+    }
+
+    @PostMapping("/form")
+    public String postNewArticle(ArticleRequest articleRequest) {
+        //TODO: 인증 정보 추가
+        articleService.saveArticle(
+                articleRequest.toDto(
+                        UserAccountDto.of(
+                                "joo",
+                                "pw",
+                                "joo@gmail.com",
+                                "Joo",
+                                "memo",
+                                null,
+                                null,
+                                null,
+                                null)
+                )
+        );
+        return "redirect:/articles";
+    }
+
+    @GetMapping("/{articleId}/form")
+    public String updateArticle(@PathVariable Long articleId, Model model) {
+        ArticleResponse article = ArticleResponse.from(articleService.getArticle(articleId));
+
+        model.addAttribute("article", article);
+        model.addAttribute("formStatus", FormStatus.UPDATE);
+
+        return "articles/form";
+    }
+
+    @PostMapping("/{articleId}/form")
+    public String postUpdateArticle(@PathVariable Long articleId, ArticleRequest articleRequest) {
+        //TODO: 인증 정보 추가
+        articleService.updateArticle(
+                articleId,
+                articleRequest.toDto(
+                        UserAccountDto.of(
+                                "joo",
+                                "pw",
+                                "joo@gmail.com",
+                                "Joo",
+                                "memo",
+                                null,
+                                null,
+                                null,
+                                null)
+                )
+        );
+        return "redirect:/articles" + articleId;
+    }
+
+    @PostMapping("{articleId}/delete")
+    public String deleteArticle(@PathVariable Long articleId) {
+        //TODO: 인증 정보 추가
+        articleService.deleteArticle(articleId);
+        return "redirect:/articles";
     }
 }
