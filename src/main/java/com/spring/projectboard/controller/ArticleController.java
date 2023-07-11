@@ -134,7 +134,7 @@ public class ArticleController {
                                 null)
                 )
         );
-        return "redirect:/articles" + articleId;
+        return "redirect:/articles/" + articleId;
     }
 
     @PostMapping("{articleId}/delete")

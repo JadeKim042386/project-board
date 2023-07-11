@@ -14,6 +14,7 @@ import com.spring.projectboard.util.FormDataEncoder;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -43,7 +44,7 @@ class ArticleControllerTest {
     @MockBean private ArticleService articleService;
     @MockBean private PaginationService paginationService;
 
-    public ArticleControllerTest(MockMvc mvc, FormDataEncoder formDataEncoder) {
+    public ArticleControllerTest(@Autowired MockMvc mvc, @Autowired FormDataEncoder formDataEncoder) {
         this.mvc = mvc;
         this.formDataEncoder = formDataEncoder;
     }
