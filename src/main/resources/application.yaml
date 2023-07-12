@@ -34,9 +34,8 @@ spring:
 ---
 
 spring:
-  config.activate.on-profile: testdb
+  config.activate.on-profile: cloudtype
   datasource:
-    url: jdbc:h2:mem:board;mode=mysql
-    driver-class-name: org.h2.Driver
+    url: ${mariadb_url}
+  hibernate.ddl-auto: create
   sql.init.mode: always
-  test.database.replace: none # mysql datasource를 사용할 건데 h2 in-memory가 자동으로 들어가기때문
