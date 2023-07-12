@@ -41,4 +41,6 @@ public interface ArticleRepository extends
     Page<Article> findByUserAccount_NicknameContaining(String searchKeyword, Pageable pageable);
 
     Page<Article> findByHashtag(String s, Pageable pageable);
+
+    void deleteByIdAndUserAccount_UserId(Long articleId, String userId);
 }

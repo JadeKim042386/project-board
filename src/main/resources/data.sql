@@ -1,6 +1,6 @@
 --- 테스트 계정
-insert into user_account (user_id, user_password, nickname, email, memo, created_at, created_by, modified_at, modified_by) values ('joo', '1234asdf', 'Joo', 'jk042386@gmail.com', 'bulabula', now(), 'joo', now(), 'joo');
-insert into user_account (user_id, user_password, nickname, email, memo, created_at, created_by, modified_at, modified_by) values ('a', '1234asdf', 'A', 'a@gmail.com', 'bulabula', now(), 'a', now(), 'a');
+insert into user_account (user_id, user_password, nickname, email, memo, created_at, created_by, modified_at, modified_by) values ('joo', '{noop}1234asdf', 'Joo', 'jk042386@gmail.com', 'bulabula', now(), 'joo', now(), 'joo');
+insert into user_account (user_id, user_password, nickname, email, memo, created_at, created_by, modified_at, modified_by) values ('a', '{noop}1234asdf', 'A', 'a@gmail.com', 'bulabula', now(), 'a', now(), 'a');
 
 --- 게시글 123개
 insert into article (user_id, title, content, hashtag, created_by, modified_by, created_at, modified_at) values

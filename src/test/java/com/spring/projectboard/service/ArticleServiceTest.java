@@ -180,6 +180,7 @@ class ArticleServiceTest {
         Article article = createArticle();
         ArticleDto articleDto = createArticleDto("new title", "new content", "new hashtag");
         given(articleRepository.getReferenceById(articleDto.id())).willReturn(article);
+        given(userAccountRepository.getReferenceById(articleDto.userAccountDto().userId())).willReturn(articleDto.userAccountDto().toEntity());
         // When
         sut.updateArticle(articleDto.id(), articleDto);
         // Then
@@ -188,6 +189,7 @@ class ArticleServiceTest {
                 .hasFieldOrPropertyWithValue("content", articleDto.content())
                 .hasFieldOrPropertyWithValue("hashtag", articleDto.hashtag());
         then(articleRepository).should().getReferenceById(articleDto.id());
+        then(userAccountRepository).should().getReferenceById(articleDto.userAccountDto().userId());
     }
 
     @DisplayName("[예외] 없는 게시글 수정")
@@ -207,11 +209,12 @@ class ArticleServiceTest {
     void deleteArticle() {
         // Given
         Long article_id = 1L;
-        willDoNothing().given(articleRepository).deleteById(article_id);
+        String userId = "joo";
+        willDoNothing().given(articleRepository).deleteByIdAndUserAccount_UserId(article_id, userId);
         // When
-        sut.deleteArticle(article_id);
+        sut.deleteArticle(article_id, userId);
         // Then
-        then(articleRepository).should().deleteById(article_id);
+        then(articleRepository).should().deleteByIdAndUserAccount_UserId(article_id, userId);
     }
 
     @DisplayName("게시글 수 반환")
