@@ -5,6 +5,4 @@ spring:
     password: ${DB_ROOT_PASSWORD}
     driver-class-name: org.mariadb.jdbc.Driver
   sql.init.mode: always
-  jpa:
-    defer-datasource-initialization: false
-    hibernate.ddl-auto: create
+  jpa.hibernate.ddl-auto: validate
