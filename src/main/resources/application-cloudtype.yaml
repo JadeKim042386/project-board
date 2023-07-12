@@ -6,8 +6,5 @@ spring:
     driver-class-name: org.mariadb.jdbc.Driver
   sql.init.mode: always
   jpa:
-    properties:
-      hibernate:
-        format_sql: true
-    hibernate:
-      ddl-auto: create
+    defer-datasource-initialization: false
+    hibernate.ddl-auto: create
