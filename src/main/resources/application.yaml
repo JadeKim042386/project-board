@@ -34,8 +34,11 @@ spring:
 ---
 
 spring:
-  config.activate.on-profile: cloudtype
+  config.activate.on-profile: ${PROFILE}
   datasource:
-    url: ${mariadb_url}
+    url: jdbc:mariadb://${DB_HOST}:${DB_PORT}/${DB_NAME}?useSSL=false
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.mariadb.jdbc.Driver
   hibernate.ddl-auto: create
   sql.init.mode: always
