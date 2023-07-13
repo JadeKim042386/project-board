@@ -1,6 +1,7 @@
 package com.spring.projectboard.dto;
 
 import com.spring.projectboard.domain.Article;
+import com.spring.projectboard.domain.Hashtag;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
@@ -11,7 +12,7 @@ public record ArticleWithCommentsDto(
         Long id,
         String title,
         String content,
-        String hashtag,
+        Set<HashtagDto> hashtagDtos,
         UserAccountDto userAccountDto,
         Set<ArticleCommentDto> articleCommentDtos,
         LocalDateTime createdAt,
@@ -20,8 +21,8 @@ public record ArticleWithCommentsDto(
         String modifiedBy
 
 ) {
-    public static ArticleWithCommentsDto of(Long id, String title, String content, String hashtag, UserAccountDto userAccountDto, Set<ArticleCommentDto> articleCommentDtos, LocalDateTime createdAt, String createdBy, LocalDateTime modifiedAt, String modifiedBy) {
-        return new ArticleWithCommentsDto(id, title, content, hashtag, userAccountDto, articleCommentDtos, createdAt, createdBy, modifiedAt, modifiedBy);
+    public static ArticleWithCommentsDto of(Long id, String title, String content, Set<HashtagDto> hashtagDtos, UserAccountDto userAccountDto, Set<ArticleCommentDto> articleCommentDtos, LocalDateTime createdAt, String createdBy, LocalDateTime modifiedAt, String modifiedBy) {
+        return new ArticleWithCommentsDto(id, title, content, hashtagDtos, userAccountDto, articleCommentDtos, createdAt, createdBy, modifiedAt, modifiedBy);
     }
 
     public static ArticleWithCommentsDto from(Article article) {
@@ -29,9 +30,13 @@ public record ArticleWithCommentsDto(
                 article.getId(),
                 article.getTitle(),
                 article.getContent(),
-                article.getHashtag(),
+                article.getHashtags().stream()
+                        .map(HashtagDto::from)
+                        .collect(Collectors.toCollection(LinkedHashSet::new)),
                 UserAccountDto.from(article.getUserAccount()),
-                article.getArticleComments().stream().map(ArticleCommentDto::from).collect(Collectors.toCollection(LinkedHashSet::new)),
+                article.getArticleComments().stream()
+                        .map(ArticleCommentDto::from)
+                        .collect(Collectors.toCollection(LinkedHashSet::new)),
                 article.getCreatedAt(),
                 article.getCreatedBy(),
                 article.getModifiedAt(),

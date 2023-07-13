@@ -1,10 +1,12 @@
 package com.spring.projectboard.controller;
 
 import com.spring.projectboard.config.TestSecurityConfig;
+import com.spring.projectboard.domain.Hashtag;
 import com.spring.projectboard.domain.constant.FormStatus;
 import com.spring.projectboard.domain.constant.SearchType;
 import com.spring.projectboard.dto.ArticleDto;
 import com.spring.projectboard.dto.ArticleWithCommentsDto;
+import com.spring.projectboard.dto.HashtagDto;
 import com.spring.projectboard.dto.UserAccountDto;
 import com.spring.projectboard.dto.response.ArticleResponse;
 import com.spring.projectboard.request.ArticleRequest;
@@ -240,7 +242,7 @@ class ArticleControllerTest {
     @Test
     void saveNewArticle() throws Exception {
         // Given
-        ArticleRequest articleRequest = ArticleRequest.of("new title", "new content", "#new");
+        ArticleRequest articleRequest = ArticleRequest.of("new title", "new content");
         willDoNothing().given(articleService).saveArticle(any(ArticleDto.class));
         // When & Then
         mvc.perform(
@@ -255,13 +257,28 @@ class ArticleControllerTest {
         then(articleService).should().saveArticle(any(ArticleDto.class));
     }
 
+    @DisplayName("[view][GET] 게시글 수정 페이지 - 인증 실패")
+    @Test
+    void updateArticleNoAuth() throws Exception {
+        // Given
+        long articleId = 1L;
+        // When & Then
+        mvc.perform(
+                    get("/articles/" + articleId + "/form")
+                )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrlPattern("**/login"));
+
+        then(articleService).shouldHaveNoInteractions();
+    }
+
     @WithMockUser
-    @DisplayName("[view][POST] 게시글 수정 페이지")
+    @DisplayName("[view][GET] 게시글 수정 페이지 - 정상 호출, 인증된 사용자")
     @Test
     void updateArticle() throws Exception {
         // Given
         long articleId = 1L;
-        ArticleDto dto = createArticleDto("title", "content", "#java");
+        ArticleDto dto = createArticleDto("title", "content", "java");
         given(articleService.getArticle(articleId)).willReturn(dto);
         // When & Then
         mvc.perform(
@@ -281,7 +298,7 @@ class ArticleControllerTest {
     void saveUpdateArticle() throws Exception {
         // Given
         long articleId = 1L;
-        ArticleRequest articleRequest = ArticleRequest.of("new title", "new content", "#new");
+        ArticleRequest articleRequest = ArticleRequest.of("new title", "new content");
         willDoNothing().given(articleService).updateArticle(eq(articleId), any(ArticleDto.class));
         // When & Then
         mvc.perform(
@@ -322,7 +339,7 @@ class ArticleControllerTest {
                 createUserAccountDto(),
                 title,
                 content,
-                hashtag,
+                Set.of(HashtagDto.of(hashtag)),
                 LocalDateTime.now(),
                 "joo",
                 LocalDateTime.now(),
@@ -335,7 +352,7 @@ class ArticleControllerTest {
                 1L,
                 "title",
                 "content",
-                "hashtag",
+                Set.of(HashtagDto.of("hashtag")),
                 createUserAccountDto(),
                 Set.of(),
                 LocalDateTime.now(),

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -35,7 +36,7 @@ public class ArticleService {
             case CONTENT -> articleRepository.findByContentContaining(searchKeyword, pageable).map(ArticleDto::from);
             case ID -> articleRepository.findByUserAccount_UserIdContaining(searchKeyword, pageable).map(ArticleDto::from);
             case NICKNAME -> articleRepository.findByUserAccount_NicknameContaining(searchKeyword, pageable).map(ArticleDto::from);
-            case HASHTAG -> articleRepository.findByHashtag("#" + searchKeyword, pageable).map(ArticleDto::from);
+            case HASHTAG -> articleRepository.findByHashtagNames(Arrays.stream(searchKeyword.split(" ")).toList(), pageable).map(ArticleDto::from);
         };
     }
 
@@ -67,7 +68,6 @@ public class ArticleService {
                 if (articleDto.content() != null) {
                     article.setContent(articleDto.content());
                 }
-                article.setHashtag(articleDto.hashtag());
             }
         } catch (EntityNotFoundException e) {
             log.warn("게시글 업데이트 실패! 게시글을 수정하는데 필요한 정보를 찾을 수 없습니다 - {}", e);
@@ -87,7 +87,7 @@ public class ArticleService {
         if (hashtag == null || hashtag.isBlank()) {
             return Page.empty(pageable);
         }
-        return articleRepository.findByHashtag(hashtag, pageable).map(ArticleDto::from);
+        return articleRepository.findByHashtagNames(List.of(hashtag), pageable).map(ArticleDto::from);
     }
 
     public List<String> getHashtags() {
