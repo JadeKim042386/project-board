@@ -1,0 +1,48 @@
+name: Deploy to cloudtype
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Connect deploy key
+        uses: cloudtype-github-actions/connect@v1
+        with:
+          token: ${{ secrets.CLOUDTYPE_TOKEN }}
+          ghtoken: ${{ secrets.GHP_TOKEN }}
+      - name: Deploy
+        uses: cloudtype-github-actions/deploy@v1
+        with:
+          token: ${{ secrets.CLOUDTYPE_TOKEN }}
+          project: jk042386/board_service
+          stage: main
+          yaml: |
+            name: project-board
+            app: java@17
+            options:
+              ports: 8080
+              env:
+                - name: DB_HOST
+                  var: db_host
+                - name: DB_PORT
+                  var: db_port
+                - name: DB_USERNAME
+                  secret: mariadb-username
+                - name: DB_ROOT_PASSWORD
+                  secret: mariadb-root-password
+                - name: DB_ROOT_USERNAME
+                  secret: mariadb-root-username
+                - name: DB_PASSWORD
+                  secret: mariadb-user-password
+                - name: DB_NAME
+                  secret: db_name
+                - name: SPRING_PROFILES_ACTIVE
+                  value: cloudtype
+            context:
+              git:
+                url: git@github.com:${{ github.repository }}.git
+                ref: ${{ github.ref }}
