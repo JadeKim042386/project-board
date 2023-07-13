@@ -24,11 +24,21 @@ public class Article extends AuditingFields{
     @GeneratedValue(strategy = GenerationType.IDENTITY) //MySQL에서는 IDENTITY 방식으로 auto-increase
     private Long id;
 
-    @Setter @ManyToOne(optional = false) @JoinColumn(name = "userId") private UserAccount userAccount;
-    @Setter @Column(nullable = false) private String title; //제목
-    @Setter @Column(nullable = false, length=10000) String content; //본문
+    @Setter
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "userId")
+    private UserAccount userAccount;
 
-    @Setter private String hashtag; //해시태그
+    @Setter
+    @Column(nullable = false)
+    private String title; //제목
+
+    @Setter
+    @Column(nullable = false, length=10000)
+    String content; //본문
+
+    @Setter
+    private String hashtag; //해시태그
 
     @ToString.Exclude
     @OrderBy("createdAt DESC")
