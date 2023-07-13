@@ -12,7 +12,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
@@ -100,6 +100,41 @@ class JpaRepositoryTest {
         // Then
         assertThat(articleRepository.count()).isEqualTo(previousArticleCount - 1);
         assertThat(articleCommentRepository.count()).isEqualTo(previousArticleCommentCount - deletedCommentsSize);
+    }
+
+    @DisplayName("[Querydsl] 전체 hashtag 리스트에서 이름만 조회")
+    @Test
+    void givenNothing_whenQueryingHashtags_thenReturnsHashtagNames() {
+        // Given
+
+        // When
+        List<String> hashtagNames = hashtagRepository.findAllHashtagNames();
+
+        // Then
+        assertThat(hashtagNames).hasSize(19);
+    }
+
+    @DisplayName("[Querydsl] hashtag로 페이징된 게시글 검색")
+    @Test
+    void givenHashtagNamesAndPageable_whenQueryingArticles_thenReturnsArticlePage() {
+        // Given
+        List<String> hashtagNames = List.of("blue", "crimson", "fuscia");
+        Pageable pageable = PageRequest.of(0, 5, Sort.by(
+                Sort.Order.desc("hashtags.hashtagName"),
+                Sort.Order.asc("title")
+        ));
+
+        // When
+        Page<Article> articlePage = articleRepository.findByHashtagNames(hashtagNames, pageable);
+
+        // Then
+        assertThat(articlePage.getContent()).hasSize(pageable.getPageSize());
+        assertThat(articlePage.getContent().get(0).getTitle()).isEqualTo("Fusce posuere felis sed lacus.");
+        assertThat(articlePage.getContent().get(0).getHashtags())
+                .extracting("hashtagName", String.class)
+                .containsExactly("fuscia");
+        assertThat(articlePage.getTotalElements()).isEqualTo(17);
+        assertThat(articlePage.getTotalPages()).isEqualTo(4);
     }
 
     @EnableJpaAuditing
