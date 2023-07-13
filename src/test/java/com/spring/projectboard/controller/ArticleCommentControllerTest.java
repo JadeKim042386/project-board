@@ -1,14 +1,9 @@
 package com.spring.projectboard.controller;
 
-import com.spring.projectboard.config.SecurityConfig;
 import com.spring.projectboard.config.TestSecurityConfig;
 import com.spring.projectboard.dto.ArticleCommentDto;
-import com.spring.projectboard.dto.ArticleDto;
 import com.spring.projectboard.request.ArticleCommentRequest;
-import com.spring.projectboard.request.ArticleRequest;
 import com.spring.projectboard.service.ArticleCommentService;
-import com.spring.projectboard.service.ArticleService;
-import com.spring.projectboard.service.PaginationService;
 import com.spring.projectboard.util.FormDataEncoder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +18,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.willDoNothing;

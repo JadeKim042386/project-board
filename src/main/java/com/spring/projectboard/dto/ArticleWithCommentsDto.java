@@ -1,7 +1,6 @@
 package com.spring.projectboard.dto;
 
 import com.spring.projectboard.domain.Article;
-import com.spring.projectboard.domain.Hashtag;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;

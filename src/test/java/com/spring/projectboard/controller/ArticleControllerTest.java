@@ -1,7 +1,6 @@
 package com.spring.projectboard.controller;
 
 import com.spring.projectboard.config.TestSecurityConfig;
-import com.spring.projectboard.domain.Hashtag;
 import com.spring.projectboard.domain.constant.FormStatus;
 import com.spring.projectboard.domain.constant.SearchType;
 import com.spring.projectboard.dto.ArticleDto;

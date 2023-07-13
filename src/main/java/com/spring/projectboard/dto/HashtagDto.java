@@ -1,9 +1,7 @@
 package com.spring.projectboard.dto;
 
 import com.spring.projectboard.domain.Hashtag;
-import org.springframework.hateoas.mediatype.hal.Jackson2HalModule;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public record HashtagDto(
