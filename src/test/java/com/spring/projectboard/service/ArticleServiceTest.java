@@ -5,6 +5,7 @@ import com.spring.projectboard.domain.UserAccount;
 import com.spring.projectboard.domain.constant.SearchType;
 import com.spring.projectboard.dto.ArticleDto;
 import com.spring.projectboard.dto.ArticleWithCommentsDto;
+import com.spring.projectboard.dto.HashtagDto;
 import com.spring.projectboard.dto.UserAccountDto;
 import com.spring.projectboard.repository.ArticleRepository;
 import com.spring.projectboard.repository.UserAccountRepository;
@@ -15,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -22,6 +24,7 @@ import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -65,14 +68,14 @@ class ArticleServiceTest {
     @Test
     void searchArticlesWithHashtag() {
         // Given
-        String hashtag = "#java";
+        String hashtagName = "java";
         Pageable pageable = Pageable.ofSize(20);
-        given(articleRepository.findByHashtag(hashtag, pageable)).willReturn(Page.empty(pageable));
+        given(articleRepository.findByHashtagNames(List.of(hashtagName), pageable)).willReturn(new PageImpl<>(List.of(), pageable, 0));
         // When
-        Page<ArticleDto> articles = sut.searchArticlesViaHashtag(hashtag, pageable);
+        Page<ArticleDto> articles = sut.searchArticlesViaHashtag(hashtagName, pageable);
         // Then
         assertThat(articles).isEqualTo(Page.empty(pageable));
-        then(articleRepository).should().findByHashtag(hashtag, pageable);
+        then(articleRepository).should().findByHashtagNames(List.of(hashtagName), pageable);
     }
 
     @DisplayName("검색어 없이 해시태그 검색하여 게시글 페이지 반환")
@@ -114,7 +117,11 @@ class ArticleServiceTest {
         assertThat(dto)
                 .hasFieldOrPropertyWithValue("title", article.getTitle())
                 .hasFieldOrPropertyWithValue("content", article.getContent())
-                .hasFieldOrPropertyWithValue("hashtag", article.getHashtag());
+                .hasFieldOrPropertyWithValue("hashtagDtos", article.getHashtags().stream()
+                        .map(HashtagDto::from)
+                        .collect(Collectors.toUnmodifiableSet())
+                );
+
         then(articleRepository).should().findById(articleId);
     }
 
@@ -144,7 +151,11 @@ class ArticleServiceTest {
         assertThat(dto)
                 .hasFieldOrPropertyWithValue("title", article.getTitle())
                 .hasFieldOrPropertyWithValue("content", article.getContent())
-                .hasFieldOrPropertyWithValue("hashtag", article.getHashtag());
+                .hasFieldOrPropertyWithValue("hashtagDtos", article.getHashtags().stream()
+                        .map(HashtagDto::from)
+                        .collect(Collectors.toUnmodifiableSet())
+                );
+
         then(articleRepository).should().findById(article_id);
     }
 
@@ -178,7 +189,7 @@ class ArticleServiceTest {
     void updateArticle() {
         // Given
         Article article = createArticle();
-        ArticleDto articleDto = createArticleDto("new title", "new content", "new hashtag");
+        ArticleDto articleDto = createArticleDto("new title", "new content");
         given(articleRepository.getReferenceById(articleDto.id())).willReturn(article);
         given(userAccountRepository.getReferenceById(articleDto.userAccountDto().userId())).willReturn(articleDto.userAccountDto().toEntity());
         // When
@@ -186,8 +197,7 @@ class ArticleServiceTest {
         // Then
         assertThat(article)
                 .hasFieldOrPropertyWithValue("title", articleDto.title())
-                .hasFieldOrPropertyWithValue("content", articleDto.content())
-                .hasFieldOrPropertyWithValue("hashtag", articleDto.hashtag());
+                .hasFieldOrPropertyWithValue("content", articleDto.content());
         then(articleRepository).should().getReferenceById(articleDto.id());
         then(userAccountRepository).should().getReferenceById(articleDto.userAccountDto().userId());
     }
@@ -196,7 +206,7 @@ class ArticleServiceTest {
     @Test
     void updateNotExistArticle() {
         // Given
-        ArticleDto articleDto = createArticleDto("new title", "new content", "new hashtag");
+        ArticleDto articleDto = createArticleDto("new title", "new content");
         given(articleRepository.getReferenceById(articleDto.id())).willThrow(EntityNotFoundException.class);
         // When
         sut.updateArticle(articleDto.id(), articleDto);
@@ -234,8 +244,7 @@ class ArticleServiceTest {
         Article article = Article.of(
                 createUserAccount(),
                 "title",
-                "content",
-                "hashtag"
+                "content"
         );
         ReflectionTestUtils.setField(article, "id", 1L);
         return article;
@@ -252,16 +261,16 @@ class ArticleServiceTest {
     }
 
     private ArticleDto createArticleDto() {
-        return createArticleDto("title", "content", "hashtag");
+        return createArticleDto("title", "content");
     }
 
-    private ArticleDto createArticleDto(String title, String content, String hashtag) {
+    private ArticleDto createArticleDto(String title, String content) {
         return ArticleDto.of(
                 1L,
                 createUserAccountDto(),
                 title,
                 content,
-                hashtag,
+                null,
                 LocalDateTime.now(),
                 "joo",
                 LocalDateTime.now(),
