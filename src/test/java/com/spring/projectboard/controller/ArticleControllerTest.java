@@ -10,6 +10,7 @@ import com.spring.projectboard.dto.UserAccountDto;
 import com.spring.projectboard.dto.response.ArticleResponse;
 import com.spring.projectboard.request.ArticleRequest;
 import com.spring.projectboard.service.ArticleService;
+import com.spring.projectboard.service.HashtagService;
 import com.spring.projectboard.service.PaginationService;
 import com.spring.projectboard.util.FormDataEncoder;
 import org.junit.jupiter.api.Disabled;
@@ -46,6 +47,7 @@ class ArticleControllerTest {
     private final MockMvc mvc;
     private final FormDataEncoder formDataEncoder;
 
+    @MockBean private HashtagService hashtagService;
     @MockBean private ArticleService articleService;
     @MockBean private PaginationService paginationService;
 
@@ -182,7 +184,7 @@ class ArticleControllerTest {
         List<String> hashtags = List.of("#java", "#spring", "#boot");
         given(articleService.searchArticlesViaHashtag(eq(null), any(Pageable.class))).willReturn(Page.empty());
         given(paginationService.getPaginationBarNumbers(anyInt(), anyInt())).willReturn(List.of(1, 2, 3, 4, 5));
-        given(articleService.getHashtags()).willReturn(hashtags);
+        given(hashtagService.getHashtags()).willReturn(hashtags);
         // When
         mvc.perform(get("/articles/search-hashtag"))
                 .andExpect(status().isOk())
@@ -194,7 +196,7 @@ class ArticleControllerTest {
                 .andExpect(model().attribute("searchType", SearchType.HASHTAG));
         //Then
         then(articleService).should().searchArticlesViaHashtag(eq(null), any(Pageable.class));
-        then(articleService).should().getHashtags();
+        then(hashtagService).should().getHashtags();
         then(paginationService).should().getPaginationBarNumbers(anyInt(), anyInt());
     }
 
@@ -206,7 +208,7 @@ class ArticleControllerTest {
         List<String> hashtags = List.of("#java", "#spring", "#boot");
         given(articleService.searchArticlesViaHashtag(eq(hashtag), any(Pageable.class))).willReturn(Page.empty());
         given(paginationService.getPaginationBarNumbers(anyInt(), anyInt())).willReturn(List.of(1, 2, 3, 4, 5));
-        given(articleService.getHashtags()).willReturn(hashtags);
+        given(hashtagService.getHashtags()).willReturn(hashtags);
         // When
         mvc.perform(get("/articles/search-hashtag")
                         .queryParam("searchValue", hashtag))
@@ -218,7 +220,7 @@ class ArticleControllerTest {
                 .andExpect(model().attributeExists("paginationBarNumbers"));
         //Then
         then(articleService).should().searchArticlesViaHashtag(eq(hashtag), any(Pageable.class));
-        then(articleService).should().getHashtags();
+        then(hashtagService).should().getHashtags();
         then(paginationService).should().getPaginationBarNumbers(anyInt(), anyInt());
     }
 

@@ -7,6 +7,7 @@ import com.spring.projectboard.dto.response.ArticleWithCommentResponse;
 import com.spring.projectboard.dto.security.BoardPrincipal;
 import com.spring.projectboard.request.ArticleRequest;
 import com.spring.projectboard.service.ArticleService;
+import com.spring.projectboard.service.HashtagService;
 import com.spring.projectboard.service.PaginationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -30,6 +31,7 @@ import java.util.List;
 @RequestMapping("/articles")
 @Controller
 public class ArticleController {
+    private final HashtagService hashtagService;
     private final ArticleService articleService;
     private final PaginationService paginationService;
     @GetMapping
@@ -67,7 +69,7 @@ public class ArticleController {
             Model model) {
         Page<ArticleResponse> articles = articleService.searchArticlesViaHashtag(searchValue, pageable).map(ArticleResponse::from);
         List<Integer> barNumbers = paginationService.getPaginationBarNumbers(pageable.getPageNumber(), articles.getTotalPages());
-        List<String> hashtags = articleService.getHashtags();
+        List<String> hashtags = hashtagService.getHashtags();
 
         model.addAttribute("articles", articles);
         model.addAttribute("hashtags", hashtags);
