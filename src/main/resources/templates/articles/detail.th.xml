@@ -13,6 +13,7 @@
             <attr sel="a"
                   th:text="'#' + ${hashtag}"
                   th:href="@{/articles(searchTypes=${searchTypeHashtag},searchValue=${hashtag})}"
+            />
         </attr>
         <attr sel="#article-content/pre" th:text="*{content}" />
         <!--수정,삭제-->
@@ -38,14 +39,16 @@
         </attr>
         <!--페이지네이션-->
         <attr sel="#pagination">
-            <attr sel="li[0]/a"
-                  th:href="*{id} - 1 <= 0 ? '#' : |/articles/*{id - 1}|"
-                  th:class="'page-link' + (*{id} - 1 <= 0 ? ' disabled' : '')"
-            />
-            <attr sel="li[1]/a"
-                  th:href="*{id} + 1 > ${totalCount} ? '#' : |/articles/*{id + 1}|"
-                  th:class="'page-link' + (*{id} - 1 > ${totalCount} ? ' disabled' : '')"
-            />
+            <attr sel="ul">
+                <attr sel="li[0]/a"
+                      th:href="${prevUri}"
+                      th:class="'page-link' + (${prevUri} == '#' ? ' disabled' : '')"
+                />
+                <attr sel="li[1]/a"
+                      th:href="${nextUri}"
+                      th:class="'page-link' + (${nextUri} == '#' ? ' disabled' : '')"
+                />
+            </attr>
         </attr>
     </attr>
 </thlogic>

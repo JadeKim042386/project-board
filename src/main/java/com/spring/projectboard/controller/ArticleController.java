@@ -10,6 +10,7 @@ import com.spring.projectboard.service.ArticleService;
 import com.spring.projectboard.service.HashtagService;
 import com.spring.projectboard.service.PaginationService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 /**
@@ -27,6 +29,7 @@ import java.util.List;
  * /articles/search
  * /articles/search-hashtag
  */
+@Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/articles")
 @Controller
@@ -38,7 +41,7 @@ public class ArticleController {
     public String articles(
             @RequestParam(required = false) SearchType searchType,
             @RequestParam(required = false) String searchValue,
-            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @PageableDefault(size=10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             Model model) {
         Page<ArticleResponse> articles = articleService.searchArticles(searchType, searchValue, pageable).map(ArticleResponse::from);
         List<Integer> barNumbers = paginationService.getPaginationBarNumbers(pageable.getPageNumber(), articles.getTotalPages());
@@ -50,22 +53,24 @@ public class ArticleController {
         return "articles/index";
     }
 
-    @GetMapping("/{articleId}")
+    @GetMapping("/detail")
     public String article(
-            @PathVariable Long articleId,
+            @RequestParam int articleIndex,
+            @PageableDefault(size=10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             Model model) {
-        ArticleWithCommentResponse article = ArticleWithCommentResponse.from(articleService.getArticleWithComments(articleId));
-
+        ArticleWithCommentResponse article = ArticleWithCommentResponse.from(articleService.getArticleWithCommentsByPageIndex(pageable, articleIndex));
         model.addAttribute("article", article);
         model.addAttribute("articleComments", article.articleCommentResponses());
-        model.addAttribute("totalCount", articleService.getArticleCount());
+        model.addAttribute("prevUri", paginationService.getPreviousUri(articleIndex, pageable));
+        model.addAttribute("nextUri", paginationService.getNextUri(articleIndex, pageable, articleService.getArticleCount()));
+
         return "articles/detail";
     }
 
     @GetMapping("/search-hashtag")
     public String searchHashtag(
             @RequestParam(required = false) String searchValue,
-            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @PageableDefault Pageable pageable,
             Model model) {
         Page<ArticleResponse> articles = articleService.searchArticlesViaHashtag(searchValue, pageable).map(ArticleResponse::from);
         List<Integer> barNumbers = paginationService.getPaginationBarNumbers(pageable.getPageNumber(), articles.getTotalPages());

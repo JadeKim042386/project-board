@@ -33,9 +33,15 @@
                 />
             </attr>
             <attr sel="tbody" th:remove="all-but-first">
-                <attr sel="tr[0]" th:each="article : ${articles}">
-                    <attr sel="td.title/a" th:text="${article.title}" th:href="@{'/articles/' + ${article.id}}" />
-                    <attr sel="td.hashtag/span" th:eash="hashtag : ${article.hashtags}">
+                <attr sel="tr[0]" th:each="article, articleStat : ${articles}">
+                    <attr sel="td.title/a"
+                          th:text="${article.title}"
+                          th:href="@{'/articles/detail'
+                              (articleIndex=${articleStat.index},
+                              page=${articles.number},
+                              sort='createdAt' + (*{sort.getOrderFor('createdAt')} != null ? (*{sort.getOrderFor('createdAt').direction.name} != 'DESC' ? ',desc' : '') : ''))}"
+                    />
+                    <attr sel="td.hashtag/span" th:each="hashtag : ${article.hashtags}">
                         <attr sel="a"
                               th:text="'#' + ${hashtag}"
                               th:href="@{/articles(searchTypes=${searchTypeHashtag},searchValue=${hashtag})}"
@@ -69,6 +75,4 @@
             />
         </attr>
     </attr>
-
-
 </thlogic>

@@ -3,6 +3,8 @@ package com.spring.projectboard.domain;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.LinkedHashSet;
@@ -16,7 +18,6 @@ import java.util.Set;
         @Index(columnList = "createdAt"),
         @Index(columnList = "createdBy")
 })
-
 @Entity
 public class Article extends AuditingFields{
     @Id

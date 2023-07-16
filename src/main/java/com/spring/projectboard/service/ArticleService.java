@@ -11,12 +11,16 @@ import com.spring.projectboard.repository.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -48,9 +52,21 @@ public class ArticleService {
         return articleRepository.findById(articleId).map(ArticleDto::from).orElseThrow(() -> new EntityNotFoundException("게시글이 없습니다 - articleId: " + articleId));
     }
 
+    @Deprecated
     @Transactional(readOnly = true)
-    public ArticleWithCommentsDto getArticleWithComments(Long articleId) {
+    public ArticleWithCommentsDto getArticleWithComments(Long articleId){
         return articleRepository.findById(articleId).map(ArticleWithCommentsDto::from).orElseThrow(() -> new EntityNotFoundException("게시글이 없습니다 - articleId: " + articleId));
+    }
+
+    @Transactional(readOnly = true)
+    public ArticleWithCommentsDto getArticleWithCommentsByPageIndex(Pageable pageable, int articleIndex) {
+        try {
+            List<Article> articles = articleRepository.findAll(pageable).getContent();
+            Article article = articles.get(articleIndex);
+            return ArticleWithCommentsDto.from(article);
+        } catch (EntityNotFoundException e) {
+            throw e;
+        }
     }
 
     /**
