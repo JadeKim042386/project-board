@@ -29,6 +29,7 @@ import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -106,7 +107,7 @@ class ArticleControllerTest {
         String direction = "desc";
         int pageNumber = 0;
         int pageSize = 5;
-        PageRequest pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Order.desc(sortName)));
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Order.desc(sortName)));
         List<Integer> barNumbers = List.of(1, 2, 3, 4, 5);
         given(articleService.searchArticles(null, null, pageable)).willReturn(Page.empty());
         given(paginationService.getPaginationBarNumbers(pageable.getPageNumber(), Page.empty().getTotalPages())).willReturn(barNumbers);
@@ -133,20 +134,34 @@ class ArticleControllerTest {
     @Test
     public void requestArticleView() throws Exception {
         // Given
-        Long article_id = 1L;
+        int articleIndex = 0;
         long totalCount = 1L;
-        given(articleService.getArticleWithComments(article_id)).willReturn(createArticleWithCommentsDto());
+        int pageNumber = 0;
+        int pageSize = 10;
+        String sortName = "createdAt";
+        String direction = "desc";
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
+        given(articleService.getArticleWithCommentsByPageIndex(pageable, articleIndex)).willReturn(createArticleWithCommentsDto());
+        given(paginationService.getPreviousUri(articleIndex, pageable)).willReturn(createPrevUri());
         given(articleService.getArticleCount()).willReturn(totalCount);
+        given(paginationService.getNextUri(articleIndex, pageable, totalCount)).willReturn(createNextUri());
         // When
-        mvc.perform(get("/articles/" + article_id))
+        mvc.perform(
+                get("/articles/detail")
+                        .queryParam("articleIndex", String.valueOf(articleIndex))
+                        .queryParam("page", String.valueOf(pageNumber))
+                        .queryParam("size", String.valueOf(pageSize))
+                        .queryParam("sort", sortName + "," + direction)
+                )
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("articles/detail"))
                 .andExpect(model().attributeExists("article"))
                 .andExpect(model().attributeExists("articleComments"))
-                .andExpect(model().attribute("totalCount", totalCount));
+                .andExpect(model().attributeExists("prevUri"))
+                .andExpect(model().attributeExists("nextUri"));
         //Then
-        then(articleService).should().getArticleWithComments(article_id);
+        then(articleService).should().getArticleWithCommentsByPageIndex(pageable, articleIndex);
         then(articleService).should().getArticleCount();
     }
 
@@ -375,5 +390,17 @@ class ArticleControllerTest {
                 LocalDateTime.now(),
                 "joo"
         );
+    }
+
+    private String createNextUri() {
+        return UriComponentsBuilder.newInstance().path("/articles/detail")
+                .queryParam("articleIndex", 1)
+                .queryParam("page", 0)
+                .build()
+                .toUriString();
+    }
+
+    private String createPrevUri() {
+        return UriComponentsBuilder.newInstance().path("#").build().toUriString();
     }
 }

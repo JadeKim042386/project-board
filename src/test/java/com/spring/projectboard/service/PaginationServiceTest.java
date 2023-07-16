@@ -7,6 +7,9 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -59,5 +62,50 @@ class PaginationServiceTest {
         // Then
         assertThat(barLength).isEqualTo(5);
 
+    }
+
+    @DisplayName("이전 게시글 URI 반환")
+    @MethodSource
+    @ParameterizedTest
+    void getPreviousUri(int articleIndex, int pageNumber, String expectedUri) {
+        // Given
+        int pageSize = 10;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        // When
+        String actualUri = sut.getPreviousUri(articleIndex, pageable);
+        // Then
+        assertThat(actualUri).isEqualTo(expectedUri);
+    }
+
+    static Stream<Arguments> getPreviousUri() {
+        return Stream.of(
+                arguments(0, 0, "#"),
+                arguments(4, 0, "/articles/detail?articleIndex=3&page=0"),
+                arguments(0, 1, "/articles/detail?articleIndex=9&page=0"),
+                arguments(3, 1, "/articles/detail?articleIndex=2&page=1")
+        );
+    }
+
+    @DisplayName("다음 게시글 URI 반환")
+    @MethodSource
+    @ParameterizedTest
+    void getNextUri(int articleIndex, int pageNumber, String expectedUri) {
+        // Given
+        int pageSize = 10;
+        long articleTotal = 23;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        // When
+        String actualUri = sut.getNextUri(articleIndex, pageable, articleTotal);
+        // Then
+        assertThat(actualUri).isEqualTo(expectedUri);
+    }
+
+    static Stream<Arguments> getNextUri() {
+        return Stream.of(
+                arguments(0, 0, "/articles/detail?articleIndex=1&page=0"),
+                arguments(2, 2, "#"),
+                arguments(9, 1, "/articles/detail?articleIndex=0&page=2"),
+                arguments(3, 1, "/articles/detail?articleIndex=4&page=1")
+        );
     }
 }

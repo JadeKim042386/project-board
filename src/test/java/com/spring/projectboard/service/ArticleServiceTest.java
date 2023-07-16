@@ -18,9 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.persistence.EntityNotFoundException;
@@ -132,6 +130,31 @@ class ArticleServiceTest {
                 );
 
         then(articleRepository).should().findById(articleId);
+    }
+
+    @DisplayName("Page와 Index로 댓글 달린 게시글 조회")
+    @Test
+    void findArticleWithCommentsByPageIndex() {
+        // Given
+        int articleIndex = 0;
+        int pageNumber = 0;
+        int pageSize = 10;
+        String sortName = "createdAt";
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, sortName));
+        Article article = createArticle();
+        given(articleRepository.findAll(pageable)).willReturn(new PageImpl(List.of(article), pageable, 1));
+        // When
+        ArticleWithCommentsDto dto = sut.getArticleWithCommentsByPageIndex(pageable, articleIndex);
+        // Then
+        assertThat(dto)
+                .hasFieldOrPropertyWithValue("title", article.getTitle())
+                .hasFieldOrPropertyWithValue("content", article.getContent())
+                .hasFieldOrPropertyWithValue("hashtagDtos", article.getHashtags().stream()
+                        .map(HashtagDto::from)
+                        .collect(Collectors.toUnmodifiableSet())
+                );
+
+        then(articleRepository).should().findAll(pageable);
     }
 
     @DisplayName("[예외] ID로 존재하지 않는 댓글 달린 게시글 조회")
