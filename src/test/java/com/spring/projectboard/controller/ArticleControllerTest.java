@@ -1,6 +1,8 @@
 package com.spring.projectboard.controller;
 
 import com.spring.projectboard.config.TestSecurityConfig;
+import com.spring.projectboard.domain.Article;
+import com.spring.projectboard.domain.UserAccount;
 import com.spring.projectboard.domain.constant.FormStatus;
 import com.spring.projectboard.domain.constant.SearchType;
 import com.spring.projectboard.dto.ArticleDto;
@@ -28,6 +30,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -141,7 +144,7 @@ class ArticleControllerTest {
         String sortName = "createdAt";
         String direction = "desc";
         Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
-        given(articleService.getArticleWithCommentsByPageIndex(pageable, articleIndex)).willReturn(createArticleWithCommentsDto());
+        given(articleService.getArticleWithCommentsDtoByPageIndex(articleIndex, pageable)).willReturn(createArticleWithCommentsDto());
         given(paginationService.getPreviousUri(articleIndex, pageable)).willReturn(createPrevUri());
         given(articleService.getArticleCount()).willReturn(totalCount);
         given(paginationService.getNextUri(articleIndex, pageable, totalCount)).willReturn(createNextUri());
@@ -161,7 +164,7 @@ class ArticleControllerTest {
                 .andExpect(model().attributeExists("prevUri"))
                 .andExpect(model().attributeExists("nextUri"));
         //Then
-        then(articleService).should().getArticleWithCommentsByPageIndex(pageable, articleIndex);
+        then(articleService).should().getArticleWithCommentsDtoByPageIndex(articleIndex, pageable);
         then(articleService).should().getArticleCount();
     }
 
@@ -197,7 +200,7 @@ class ArticleControllerTest {
     public void requestArticleNoHashtagSearchView() throws Exception {
         // Given
         List<String> hashtags = List.of("#java", "#spring", "#boot");
-        given(articleService.searchArticlesViaHashtag(eq(null), any(Pageable.class))).willReturn(Page.empty());
+        given(articleService.searchArticleDtosViaHashtag(eq(null), any(Pageable.class))).willReturn(Page.empty());
         given(paginationService.getPaginationBarNumbers(anyInt(), anyInt())).willReturn(List.of(1, 2, 3, 4, 5));
         given(hashtagService.getHashtags()).willReturn(hashtags);
         // When
@@ -210,7 +213,7 @@ class ArticleControllerTest {
                 .andExpect(model().attributeExists("paginationBarNumbers"))
                 .andExpect(model().attribute("searchType", SearchType.HASHTAG));
         //Then
-        then(articleService).should().searchArticlesViaHashtag(eq(null), any(Pageable.class));
+        then(articleService).should().searchArticleDtosViaHashtag(eq(null), any(Pageable.class));
         then(hashtagService).should().getHashtags();
         then(paginationService).should().getPaginationBarNumbers(anyInt(), anyInt());
     }
@@ -221,7 +224,7 @@ class ArticleControllerTest {
         // Given
         String hashtag = "#java";
         List<String> hashtags = List.of("#java", "#spring", "#boot");
-        given(articleService.searchArticlesViaHashtag(eq(hashtag), any(Pageable.class))).willReturn(Page.empty());
+        given(articleService.searchArticleDtosViaHashtag(eq(hashtag), any(Pageable.class))).willReturn(Page.empty());
         given(paginationService.getPaginationBarNumbers(anyInt(), anyInt())).willReturn(List.of(1, 2, 3, 4, 5));
         given(hashtagService.getHashtags()).willReturn(hashtags);
         // When
@@ -234,7 +237,7 @@ class ArticleControllerTest {
                 .andExpect(model().attribute("hashtags", hashtags))
                 .andExpect(model().attributeExists("paginationBarNumbers"));
         //Then
-        then(articleService).should().searchArticlesViaHashtag(eq(hashtag), any(Pageable.class));
+        then(articleService).should().searchArticleDtosViaHashtag(eq(hashtag), any(Pageable.class));
         then(hashtagService).should().getHashtags();
         then(paginationService).should().getPaginationBarNumbers(anyInt(), anyInt());
     }
@@ -277,10 +280,12 @@ class ArticleControllerTest {
     @Test
     void updateArticleNoAuth() throws Exception {
         // Given
-        long articleId = 1L;
+        int articleIndex = 0;
         // When & Then
         mvc.perform(
-                    get("/articles/" + articleId + "/form")
+                    get("/articles/form")
+                            .queryParam("articleIndex", String.valueOf(articleIndex))
+                            .queryParam("pageable", String.valueOf(Pageable.ofSize(10)))
                 )
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrlPattern("**/login"));
@@ -293,19 +298,22 @@ class ArticleControllerTest {
     @Test
     void updateArticle() throws Exception {
         // Given
-        long articleId = 1L;
+        int articleIndex = 0;
+        Pageable pageable = Pageable.ofSize(10);
         ArticleDto dto = createArticleDto("title", "content", "java");
-        given(articleService.getArticle(articleId)).willReturn(dto);
+        given(articleService.getArticleDtoByPageIndex(articleIndex, pageable)).willReturn(dto);
         // When & Then
         mvc.perform(
-                get("/articles/" + articleId + "/form")
+                    get("/articles/detail/form")
+                            .queryParam("articleIndex", String.valueOf(articleIndex))
+                            .queryParam("page", String.valueOf(pageable.getPageNumber()))
         )
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("articles/form"))
                 .andExpect(model().attribute("article", ArticleResponse.from(dto)))
                 .andExpect(model().attribute("formStatus", FormStatus.UPDATE));
-        then(articleService).should().getArticle(articleId);
+        then(articleService).should().getArticleDtoByPageIndex(articleIndex, pageable);
     }
 
     @WithUserDetails(value = "jooTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
@@ -314,19 +322,26 @@ class ArticleControllerTest {
     void saveUpdateArticle() throws Exception {
         // Given
         long articleId = 1L;
+        int articleIndex = 0;
+        Pageable pageable = Pageable.ofSize(10);
+        ArticleDto dto = createArticleDto("title", "content", "java");
         ArticleRequest articleRequest = ArticleRequest.of("new title", "new content");
         willDoNothing().given(articleService).updateArticle(eq(articleId), any(ArticleDto.class));
+        given(articleService.getArticleByPageIndex(articleIndex, pageable)).willReturn(createArticle(articleId));
         // When & Then
         mvc.perform(
-                        post("/articles/" + articleId + "/form")
+                        post("/articles/detail/form")
                                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                                 .content(formDataEncoder.encode(articleRequest))
+                                .queryParam("articleIndex", String.valueOf(articleIndex))
+                                .queryParam("page", String.valueOf(pageable.getPageNumber()))
                                 .with(csrf())
                 )
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/articles/" + articleId))
-                .andExpect(redirectedUrl("/articles/" + articleId));
+                .andExpect(view().name("redirect:/articles/detail?articleIndex=0&page=0"))
+                .andExpect(redirectedUrl("/articles/detail?articleIndex=0&page=0"));
         then(articleService).should().updateArticle(eq(articleId), any(ArticleDto.class));
+        then(articleService).should().getArticleByPageIndex(articleIndex, pageable);
     }
 
     @WithUserDetails(value = "jooTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
@@ -402,5 +417,25 @@ class ArticleControllerTest {
 
     private String createPrevUri() {
         return UriComponentsBuilder.newInstance().path("#").build().toUriString();
+    }
+
+    private Article createArticle(Long id) {
+        Article article = Article.of(
+                createUserAccount("joo"),
+                "title",
+                "content"
+        );
+        ReflectionTestUtils.setField(article, "id", id);
+        return article;
+    }
+
+    private UserAccount createUserAccount(String userId) {
+        return UserAccount.of(
+                userId,
+                "pw",
+                "joo@gmail.com",
+                "joo",
+                "memo"
+        );
     }
 }

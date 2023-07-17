@@ -3,7 +3,6 @@ package com.spring.projectboard.domain;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.core.annotation.Order;
 
 import javax.persistence.*;
 import java.util.LinkedHashSet;

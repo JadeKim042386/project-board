@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithUserDetails;
@@ -45,6 +46,8 @@ class ArticleCommentControllerTest {
     void saveNewComment() throws Exception {
         // Given
         long articleId = 1L;
+        int articleIndex = 0;
+        Pageable pageable = Pageable.ofSize(10);
         ArticleCommentRequest request = ArticleCommentRequest.of(articleId, "test comment");
         willDoNothing().given(articleCommentService).saveComment(any(ArticleCommentDto.class));
         // When & Then
@@ -52,11 +55,13 @@ class ArticleCommentControllerTest {
                         post("/comments/new")
                                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                                 .content(formDataEncoder.encode(request))
+                                .queryParam("articleIndex", String.valueOf(articleIndex))
+                                .queryParam("page", String.valueOf(pageable.getPageNumber()))
                                 .with(csrf())
                 )
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/articles/" + articleId))
-                .andExpect(redirectedUrl("/articles/" + articleId));
+                .andExpect(view().name("redirect:/articles/detail?articleIndex=0&page=0"))
+                .andExpect(redirectedUrl("/articles/detail?articleIndex=0&page=0"));
         then(articleCommentService).should().saveComment(any(ArticleCommentDto.class));
     }
 
@@ -80,5 +85,29 @@ class ArticleCommentControllerTest {
                 .andExpect(view().name("redirect:/articles/" + articleId))
                 .andExpect(redirectedUrl("/articles/" + articleId));
         then(articleCommentService).should().deleteComment(articleCommentId, userId);
+    }
+
+    @WithUserDetails(value = "jooTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @DisplayName("[view][POST] 대댓글 등록 - 정상 호출")
+    @Test
+    void addChildComment() throws Exception {
+        // Given
+        long articleId = 1L;
+        long parentCommentId = 1L;
+        ArticleCommentRequest request = ArticleCommentRequest.of(articleId, parentCommentId, "test content");
+        willDoNothing().given(articleCommentService).saveComment(any(ArticleCommentDto.class));
+        // When & Then
+        mvc.perform(
+                post("/comments/new")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .queryParam("articleIndex", String.valueOf(0))
+                        .queryParam("pageable", String.valueOf(Pageable.ofSize(10)))
+                        .content(formDataEncoder.encode(request))
+                        .with(csrf())
+            )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/articles/detail?articleIndex=0&page=0"))
+                .andExpect(redirectedUrl("/articles/detail?articleIndex=0&page=0"));
+        then(articleCommentService).should().saveComment(any(ArticleCommentDto.class));
     }
 }

@@ -4,7 +4,6 @@ import com.spring.projectboard.domain.Article;
 import com.spring.projectboard.domain.Hashtag;
 import com.spring.projectboard.domain.UserAccount;
 import com.spring.projectboard.repository.HashtagRepository;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,8 +18,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.params.provider.Arguments.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.BDDMockito.*;
 
 @DisplayName("비지니스 로직 - 해시태그")

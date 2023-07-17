@@ -16,26 +16,39 @@
             />
         </attr>
         <attr sel="#article-content/pre" th:text="*{content}" />
-        <!--수정,삭제-->
+        <!--게시글 수정,삭제-->
         <attr sel="#article-buttons" th:if="${#authorization.expression('isAuthenticated()')} and *{userId} == ${#authentication.name}">
             <attr sel="#delete-article-form" th:action="'/articles/' + *{id} + '/delete'" th:method="post">
-                <attr sel="#update-article" th:href="'/articles/' + *{id} + '/form'" />
+                <attr sel="#update-article" th:href="@{/articles/detail/form(articleIndex=${articleIndex}, page=${pageNumber})}" />
             </attr>
         </attr>
         <!--댓글-->
         <attr sel=".article-id" th:name="articleId" th:value="*{id}" />
-        <attr sel="#comment-form" th:action="@{/comments/new}" th:method="post">
-            <attr sel="#comment-textbox" th:name="content" />
+        <attr sel=".comment-form" th:action="@{/comments/new(articleIndex=${articleIndex}, page=${pageNumber})}" th:method="post">
+            <attr sel=".comment-textbox" th:name="content" />
         </attr>
         <attr sel="#article-comments" th:remove="all-but-first">
-            <attr sel="li[0]" th:each="articleComment : ${articleComments}">
-                <attr sel="form" th:action="'/comments/' + ${articleComment.id} + '/delete'" th:method="post">
+            <!--부모 댓글-->
+            <attr sel=".parent-form[0]" th:each="articleComment : ${articleComments}">
+                <attr sel=".comment-delete-form" th:action="'/comments/' + ${articleComment.id} + '/delete'" th:method="post">
                     <attr sel="div/strong" th:text="${articleComment.nickname}" />
                     <attr sel="div/small/time" th:datetime="${articleComment.createdAt}" th:text="${#temporals.format(articleComment.createdAt, 'yyyy-MM-dd HH:mm:ss')}" />
                     <attr sel="div/p" th:text="${articleComment.content}" />
                     <attr sel="button" th:if="${#authorization.expression('isAuthenticated()')} and ${articleComment.userId} == ${#authentication.name}" />
                 </attr>
+                <!--자식 댓글-->
+                <attr sel="ul" th:if="${!articleComment.childComments.isEmpty}" th:remove="all-but-first">
+                    <attr sel=".child-comment[0]" th:each="childComment : ${articleComment.childComments}">
+                        <attr sel=".comment-delete-form" th:action="'/comments/' + ${childComment.id} + '/delete'" th:method="post">
+                            <attr sel="div/strong" th:text="${childComment.nickname}" />
+                            <attr sel="div/small/time" th:datetime="${childComment.createdAt}" th:text="${#temporals.format(childComment.createdAt, 'yyyy-MM-dd HH:mm:ss')}" />
+                            <attr sel="div/p" th:text="${childComment.content}" />
+                            <attr sel="button" th:if="${#authorization.expression('isAuthenticated()')} and ${childComment.userId} == ${#authentication.name}" />
+                        </attr>
+                    </attr>
+                </attr>
             </attr>
+            <attr sel=".parent-comment-id" th:name="parentCommentId" th:value="${articleComment.id}" />
         </attr>
         <!--페이지네이션-->
         <attr sel="#pagination">

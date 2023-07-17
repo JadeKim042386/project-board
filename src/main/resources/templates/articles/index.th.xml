@@ -38,8 +38,7 @@
                           th:text="${article.title}"
                           th:href="@{'/articles/detail'
                               (articleIndex=${articleStat.index},
-                              page=${articles.number},
-                              sort='createdAt' + (*{sort.getOrderFor('createdAt')} != null ? (*{sort.getOrderFor('createdAt').direction.name} != 'DESC' ? ',desc' : '') : ''))}"
+                              page=${articles.number})}"
                     />
                     <attr sel="td.hashtag/span" th:each="hashtag : ${article.hashtags}">
                         <attr sel="a"
@@ -53,8 +52,10 @@
             </attr>
         </attr>
 
+        <!--글쓰기-->
         <attr sel="#write-article" sec:authorize="isAuthenticated()" th:href="@{/articles/form}" />
-        
+
+        <!--페이지네이션-->
         <attr sel="#pagination">
             <attr sel="li[0]/a"
                   th:text="'Previous'"

@@ -19,8 +19,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 /**
@@ -58,9 +58,13 @@ public class ArticleController {
             @RequestParam int articleIndex,
             @PageableDefault(size=10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             Model model) {
-        ArticleWithCommentResponse article = ArticleWithCommentResponse.from(articleService.getArticleWithCommentsByPageIndex(pageable, articleIndex));
+        ArticleWithCommentResponse article = ArticleWithCommentResponse.from(
+                articleService.getArticleWithCommentsDtoByPageIndex(articleIndex, pageable)
+        );
         model.addAttribute("article", article);
         model.addAttribute("articleComments", article.articleCommentResponses());
+        model.addAttribute("pageNumber", pageable.getPageNumber());
+        model.addAttribute("articleIndex", articleIndex);
         model.addAttribute("prevUri", paginationService.getPreviousUri(articleIndex, pageable));
         model.addAttribute("nextUri", paginationService.getNextUri(articleIndex, pageable, articleService.getArticleCount()));
 
@@ -72,7 +76,7 @@ public class ArticleController {
             @RequestParam(required = false) String searchValue,
             @PageableDefault Pageable pageable,
             Model model) {
-        Page<ArticleResponse> articles = articleService.searchArticlesViaHashtag(searchValue, pageable).map(ArticleResponse::from);
+        Page<ArticleResponse> articles = articleService.searchArticleDtosViaHashtag(searchValue, pageable).map(ArticleResponse::from);
         List<Integer> barNumbers = paginationService.getPaginationBarNumbers(pageable.getPageNumber(), articles.getTotalPages());
         List<String> hashtags = hashtagService.getHashtags();
 
@@ -102,9 +106,12 @@ public class ArticleController {
         return "redirect:/articles";
     }
 
-    @GetMapping("/{articleId}/form")
-    public String updateArticle(@PathVariable Long articleId, Model model) {
-        ArticleResponse article = ArticleResponse.from(articleService.getArticle(articleId));
+    @GetMapping("/detail/form")
+    public String updateArticle(
+            @RequestParam int articleIndex,
+            @PageableDefault(size=10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            Model model) {
+        ArticleResponse article = ArticleResponse.from(articleService.getArticleDtoByPageIndex(articleIndex, pageable));
 
         model.addAttribute("article", article);
         model.addAttribute("formStatus", FormStatus.UPDATE);
@@ -112,18 +119,21 @@ public class ArticleController {
         return "articles/form";
     }
 
-    @PostMapping("/{articleId}/form")
+    @PostMapping("/detail/form")
     public String postUpdateArticle(
-            @PathVariable Long articleId,
             ArticleRequest articleRequest,
+            @RequestParam int articleIndex,
+            @PageableDefault(size=10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             @AuthenticationPrincipal BoardPrincipal boardPrincipal) {
         articleService.updateArticle(
-                articleId,
-                articleRequest.toDto(
-                        boardPrincipal.toDto()
-                )
+                articleService.getArticleByPageIndex(articleIndex, pageable).getId(),
+                articleRequest.toDto(boardPrincipal.toDto())
         );
-        return "redirect:/articles/" + articleId;
+        return UriComponentsBuilder.newInstance()
+                .path("redirect:/articles/detail")
+                .queryParam("articleIndex", articleIndex)
+                .queryParam("page", pageable.getPageNumber())
+                .build().toUriString();
     }
 
     @PostMapping("{articleId}/delete")

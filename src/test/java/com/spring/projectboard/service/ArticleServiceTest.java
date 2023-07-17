@@ -77,7 +77,7 @@ class ArticleServiceTest {
         Pageable pageable = Pageable.ofSize(20);
         given(articleRepository.findByHashtagNames(Set.of(hashtagName), pageable)).willReturn(new PageImpl<>(List.of(expectedArticle), pageable, 1));
         // When
-        Page<ArticleDto> articles = sut.searchArticlesViaHashtag(hashtagName, pageable);
+        Page<ArticleDto> articles = sut.searchArticleDtosViaHashtag(hashtagName, pageable);
         // Then
         assertThat(articles).isEqualTo(new PageImpl<>(List.of(ArticleDto.from(expectedArticle)), pageable, 1));
         then(articleRepository).should().findByHashtagNames(Set.of(hashtagName), pageable);
@@ -89,7 +89,7 @@ class ArticleServiceTest {
         // Given
         Pageable pageable = Pageable.ofSize(20);
         // When
-        Page<ArticleDto> articles = sut.searchArticlesViaHashtag(null, pageable);
+        Page<ArticleDto> articles = sut.searchArticleDtosViaHashtag(null, pageable);
         // Then
         assertThat(articles).isEqualTo(Page.empty(pageable));
         then(hashtagRepository).shouldHaveNoInteractions();
@@ -104,7 +104,7 @@ class ArticleServiceTest {
         Pageable pageable = Pageable.ofSize(20);
         given(articleRepository.findByHashtagNames(Set.of(hashtagName), pageable)).willReturn(Page.empty(pageable));
         // When
-        Page<ArticleDto> articles = sut.searchArticlesViaHashtag(hashtagName, pageable);
+        Page<ArticleDto> articles = sut.searchArticleDtosViaHashtag(hashtagName, pageable);
         // Then
         assertThat(articles).isEqualTo(Page.empty(pageable));
         then(hashtagRepository).shouldHaveNoInteractions();
@@ -119,7 +119,7 @@ class ArticleServiceTest {
         Article article = createArticle();
         given(articleRepository.findById(articleId)).willReturn(Optional.of(article));
         // When
-        ArticleWithCommentsDto dto = sut.getArticleWithComments(articleId);
+        ArticleWithCommentsDto dto = sut.getArticleWithCommentsDto(articleId);
         // Then
         assertThat(dto)
                 .hasFieldOrPropertyWithValue("title", article.getTitle())
@@ -144,7 +144,7 @@ class ArticleServiceTest {
         Article article = createArticle();
         given(articleRepository.findAll(pageable)).willReturn(new PageImpl(List.of(article), pageable, 1));
         // When
-        ArticleWithCommentsDto dto = sut.getArticleWithCommentsByPageIndex(pageable, articleIndex);
+        ArticleWithCommentsDto dto = sut.getArticleWithCommentsDtoByPageIndex(articleIndex, pageable);
         // Then
         assertThat(dto)
                 .hasFieldOrPropertyWithValue("title", article.getTitle())
@@ -166,7 +166,7 @@ class ArticleServiceTest {
         // When
 
         // Then
-        assertThatThrownBy(() -> sut.getArticleWithComments(articleId)).isInstanceOf(EntityNotFoundException.class);
+        assertThatThrownBy(() -> sut.getArticleWithCommentsDto(articleId)).isInstanceOf(EntityNotFoundException.class);
         then(articleRepository).should().findById(articleId);
     }
 
