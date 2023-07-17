@@ -3,8 +3,6 @@ package com.spring.projectboard.domain;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.LinkedHashSet;

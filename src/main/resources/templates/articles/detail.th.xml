@@ -24,7 +24,7 @@
         </attr>
         <!--댓글-->
         <attr sel=".article-id" th:name="articleId" th:value="*{id}" />
-        <attr sel="#comment-form" th:action="@{/comments/new}" th:method="post">
+        <attr sel="#comment-form" th:action="@{/comments/new(articleIndex=${articleIndex}, page=${pageNumber})}" th:method="post">
             <attr sel="#comment-textbox" th:name="content" />
         </attr>
         <attr sel="#article-comments" th:remove="all-but-first">

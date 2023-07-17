@@ -11,12 +11,9 @@ import com.spring.projectboard.repository.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.Arrays;
@@ -47,23 +44,31 @@ public class ArticleService {
         };
     }
 
+    @Deprecated
     @Transactional(readOnly = true)
     public ArticleDto getArticle(Long articleId) {
         return articleRepository.findById(articleId).map(ArticleDto::from).orElseThrow(() -> new EntityNotFoundException("게시글이 없습니다 - articleId: " + articleId));
     }
 
+    @Transactional(readOnly = true)
+    public ArticleDto getArticleDtoByPageIndex(int articleIndex, Pageable pageable) {
+        try {
+            return ArticleDto.from(getArticleByPageIndex(articleIndex, pageable));
+        } catch (EntityNotFoundException e) {
+            throw e;
+        }
+    }
+
     @Deprecated
     @Transactional(readOnly = true)
-    public ArticleWithCommentsDto getArticleWithComments(Long articleId){
+    public ArticleWithCommentsDto getArticleWithCommentsDto(Long articleId){
         return articleRepository.findById(articleId).map(ArticleWithCommentsDto::from).orElseThrow(() -> new EntityNotFoundException("게시글이 없습니다 - articleId: " + articleId));
     }
 
     @Transactional(readOnly = true)
-    public ArticleWithCommentsDto getArticleWithCommentsByPageIndex(Pageable pageable, int articleIndex) {
+    public ArticleWithCommentsDto getArticleWithCommentsDtoByPageIndex(int articleIndex, Pageable pageable) {
         try {
-            List<Article> articles = articleRepository.findAll(pageable).getContent();
-            Article article = articles.get(articleIndex);
-            return ArticleWithCommentsDto.from(article);
+            return ArticleWithCommentsDto.from(getArticleByPageIndex(articleIndex, pageable));
         } catch (EntityNotFoundException e) {
             throw e;
         }
@@ -136,7 +141,7 @@ public class ArticleService {
      * 주어진 해시태그를 가지는 게시글들을 조회
      */
     @Transactional(readOnly = true)
-    public Page<ArticleDto> searchArticlesViaHashtag(String hashtagName, Pageable pageable) {
+    public Page<ArticleDto> searchArticleDtosViaHashtag(String hashtagName, Pageable pageable) {
         if (hashtagName == null || hashtagName.isBlank()) {
             return Page.empty(pageable);
         }
@@ -161,5 +166,11 @@ public class ArticleService {
         });
 
         return hashtags;
+    }
+
+    @Transactional(readOnly = true)
+    public Article getArticleByPageIndex(int articleIndex, Pageable pageable) {
+        List<Article> articles = articleRepository.findAll(pageable).getContent();
+        return articles.get(articleIndex);
     }
 }
