@@ -131,7 +131,7 @@ insert into article (user_id, title, content, created_by, modified_by, created_a
 
 --- 댓긇 300개
 insert into article_comment (article_id, user_id, parent_comment_id, content, created_at, modified_at, created_by, modified_by) values
-(49, 'joo', null, 'Quisque id justo sit amet sapien dignissim vestibulum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nulla dapibus dolor vel est. Donec odio justo, sollicitudin ut, suscipit a, feugiat et, eros.', '2021-03-02 22:40:04', '2021-04-27 15:38:09', 'Lind', 'Orv'),
+(69, 'joo', null, 'Quisque id justo sit amet sapien dignissim vestibulum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nulla dapibus dolor vel est. Donec odio justo, sollicitudin ut, suscipit a, feugiat et, eros.', '2021-03-02 22:40:04', '2021-04-27 15:38:09', 'Lind', 'Orv'),
 (108, 'joo', null, 'Quisque id justo sit amet sapien dignissim vestibulum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nulla dapibus dolor vel est. Donec odio justo, sollicitudin ut, suscipit a, feugiat et, eros.', '2021-06-08 04:36:02', '2022-01-25 15:35:42', 'Trstram', 'Loy'),
 (31, 'a', null, 'Nam ultrices, libero non mattis pulvinar, nulla pede ullamcorper augue, a suscipit nulla elit ac nulla. Sed vel enim sit amet nunc viverra dapibus. Nulla suscipit ligula in lacus.', '2021-04-10 00:47:10', '2021-02-06 20:58:04', 'Duff', 'Early'),
 (120, 'a', null, 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin risus. Praesent lectus.', '2021-08-21 08:39:39', '2021-11-17 22:47:35', 'Sydney', 'Boony'),
@@ -434,10 +434,10 @@ insert into article_comment (article_id, user_id, parent_comment_id, content, cr
 
 -- 대댓글
 insert into article_comment (article_id, user_id, parent_comment_id, content, created_at, modified_at, created_by, modified_by) values
-(49, 'joo', 1, '퍼가요~', '2021-03-02 22:40:04', '2021-04-27 15:38:09', 'Joo', 'Joo'),
-(49, 'a', 1, '퍼가요~', '2021-03-03 22:40:04', '2021-04-27 15:38:09', 'A', 'A'),
-(49, 'joo', 1, '또 퍼가요~', '2021-03-04 22:40:04', '2021-04-27 15:38:09', 'Joo', 'Joo'),
-(49, 'joo', 1, '또또 퍼가요~', '2021-03-05 22:40:04', '2021-04-27 15:38:09', 'Joo', 'Joo');
+(69, 'joo', 1, '퍼가요~', '2021-03-02 22:40:04', '2021-04-27 15:38:09', 'Joo', 'Joo'),
+(69, 'a', 1, '퍼가요~', '2021-03-03 22:40:04', '2021-04-27 15:38:09', 'A', 'A'),
+(69, 'joo', 1, '또 퍼가요~', '2021-03-04 22:40:04', '2021-04-27 15:38:09', 'Joo', 'Joo'),
+(69, 'joo', 1, '또또 퍼가요~', '2021-03-05 22:40:04', '2021-04-27 15:38:09', 'Joo', 'Joo');
 
 --- 해시태그 20개
 insert into hashtag (hashtag_name, created_at, created_by, modified_at, modified_by) values

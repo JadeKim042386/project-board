@@ -109,7 +109,7 @@ public class ArticleController {
     @GetMapping("/detail/form")
     public String updateArticle(
             @RequestParam int articleIndex,
-            @PageableDefault Pageable pageable,
+            @PageableDefault(size=10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             Model model) {
         ArticleResponse article = ArticleResponse.from(articleService.getArticleDtoByPageIndex(articleIndex, pageable));
 
@@ -123,7 +123,7 @@ public class ArticleController {
     public String postUpdateArticle(
             ArticleRequest articleRequest,
             @RequestParam int articleIndex,
-            @PageableDefault Pageable pageable,
+            @PageableDefault(size=10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             @AuthenticationPrincipal BoardPrincipal boardPrincipal) {
         articleService.updateArticle(
                 articleService.getArticleByPageIndex(articleIndex, pageable).getId(),
