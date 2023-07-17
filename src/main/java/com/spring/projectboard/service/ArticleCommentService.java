@@ -32,11 +32,22 @@ public class ArticleCommentService {
                 .toList();
     }
 
+    /**
+     * 부모 댓글 ID가 존재하면 자식 댓글이므로 부모 댓글의 자식 댓글 collection 에 추가, null 이면 부모 댓글 추가
+     */
     public void saveComment(ArticleCommentDto dto) {
         try{
             Article article = articleRepository.getReferenceById(dto.articleId());
             UserAccount userAccount = userAccountRepository.getReferenceById(dto.userAccountDto().userId());
-            articleCommentRepository.save(dto.toEntity(article, userAccount));
+            ArticleComment articleComment = dto.toEntity(article, userAccount);
+
+            if (articleComment.getParentCommentId() != null) {
+                ArticleComment parentComment = articleCommentRepository.getReferenceById(articleComment.getParentCommentId());
+                parentComment.addChildComment(articleComment);
+            } else {
+                articleCommentRepository.save(articleComment);
+            }
+
         } catch (EntityNotFoundException e) {
             log.warn("댓글 저장 실패! 댓글 작성에 필요한 정보를 찾을 수 없습니다. - {}", e);
         }
