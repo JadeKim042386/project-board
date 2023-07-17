@@ -47,7 +47,9 @@ public class ArticleService {
     @Deprecated
     @Transactional(readOnly = true)
     public ArticleDto getArticle(Long articleId) {
-        return articleRepository.findById(articleId).map(ArticleDto::from).orElseThrow(() -> new EntityNotFoundException("게시글이 없습니다 - articleId: " + articleId));
+        return articleRepository.findById(articleId)
+                .map(ArticleDto::from)
+                .orElseThrow(() -> new EntityNotFoundException("게시글이 없습니다 - articleId: " + articleId));
     }
 
     @Transactional(readOnly = true)
@@ -62,7 +64,9 @@ public class ArticleService {
     @Deprecated
     @Transactional(readOnly = true)
     public ArticleWithCommentsDto getArticleWithCommentsDto(Long articleId){
-        return articleRepository.findById(articleId).map(ArticleWithCommentsDto::from).orElseThrow(() -> new EntityNotFoundException("게시글이 없습니다 - articleId: " + articleId));
+        return articleRepository.findById(articleId)
+                .map(ArticleWithCommentsDto::from)
+                .orElseThrow(() -> new EntityNotFoundException("게시글이 없습니다 - articleId: " + articleId));
     }
 
     @Transactional(readOnly = true)
@@ -170,7 +174,8 @@ public class ArticleService {
 
     @Transactional(readOnly = true)
     public Article getArticleByPageIndex(int articleIndex, Pageable pageable) {
-        List<Article> articles = articleRepository.findAll(pageable).getContent();
-        return articles.get(articleIndex);
+        return articleRepository.findAll(pageable)
+                .getContent()
+                .get(articleIndex);
     }
 }
