@@ -1,8 +1,10 @@
 package com.spring.projectboard.repository;
 
 import com.spring.projectboard.domain.Article;
+import com.spring.projectboard.domain.ArticleComment;
 import com.spring.projectboard.domain.Hashtag;
 import com.spring.projectboard.domain.UserAccount;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,6 +99,66 @@ class JpaRepositoryTest {
         // Then
         assertThat(articleRepository.count()).isEqualTo(previousArticleCount - 1);
         assertThat(articleCommentRepository.count()).isEqualTo(previousArticleCommentCount - deletedCommentsSize);
+    }
+
+    @DisplayName("대댓글 조회")
+    @Test
+    void getChildComments() {
+        // Given
+        long articleCommentId = 1L;
+        // When
+        Optional<ArticleComment> parentComment = articleCommentRepository.findById(articleCommentId);
+        // Then
+        assertThat(parentComment).get()
+                .hasFieldOrPropertyWithValue("parentCommentId", null)
+                .extracting("childComments", InstanceOfAssertFactories.COLLECTION)
+                .hasSize(4);
+    }
+
+    @DisplayName("대댓글 추가")
+    @Test
+    void addChildComment() {
+        // Given
+        long articleCommentId = 1L;
+        ArticleComment parentComment = articleCommentRepository.getReferenceById(articleCommentId);
+        ArticleComment childComment = ArticleComment.of(
+                parentComment.getUserAccount(),
+                parentComment.getArticle(),
+                "대댓글"
+        );
+        // When
+        parentComment.addChildComment(childComment);
+        articleCommentRepository.flush();
+        // Then
+        assertThat(articleCommentRepository.findById(articleCommentId)).get()
+                .hasFieldOrPropertyWithValue("parentCommentId", null)
+                .extracting("childComments", InstanceOfAssertFactories.COLLECTION)
+                .hasSize(5);
+    }
+
+    @DisplayName("댓글과 대댓글 삭제")
+    @Test
+    void deleteCommentWithChildComments() {
+        // Given
+        long articleCommentId = 1L;
+        ArticleComment parentComment = articleCommentRepository.getReferenceById(articleCommentId);
+        long previousArticleCommentCount = articleCommentRepository.count();
+        // When
+        articleCommentRepository.delete(parentComment);
+        // Then
+        assertThat(articleCommentRepository.count()).isEqualTo(previousArticleCommentCount - 5);
+    }
+
+    @DisplayName("댓글과 대댓글 삭제 by 댓글 ID + 유저 ID")
+    void deleteCommentWithChildCommentsByCommentIdAndUserID() {
+        // Given
+        long articleCommentId = 1L;
+        String userId = "joo";
+        long previousArticleCommentCount = articleCommentRepository.count();
+        // When
+        articleCommentRepository.deleteByIdAndUserAccount_UserId(articleCommentId, userId);
+        // Then
+        assertThat(articleCommentRepository.count()).isEqualTo(previousArticleCommentCount - 5);
     }
 
     @DisplayName("[Querydsl] 전체 hashtag 리스트에서 이름만 조회")
