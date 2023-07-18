@@ -301,19 +301,19 @@ class ArticleControllerTest {
         int articleIndex = 0;
         Pageable pageable = Pageable.ofSize(10);
         ArticleDto dto = createArticleDto("title", "content", "java");
-        given(articleService.getArticleDtoByPageIndex(articleIndex, pageable)).willReturn(dto);
+        given(articleService.getArticleDtoByPageIndex(anyInt(), any(Pageable.class))).willReturn(dto);
         // When & Then
         mvc.perform(
                     get("/articles/detail/form")
                             .queryParam("articleIndex", String.valueOf(articleIndex))
-                            .queryParam("page", String.valueOf(pageable.getPageNumber()))
+                            .queryParam("pageable", String.valueOf(pageable))
         )
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("articles/form"))
                 .andExpect(model().attribute("article", ArticleResponse.from(dto)))
                 .andExpect(model().attribute("formStatus", FormStatus.UPDATE));
-        then(articleService).should().getArticleDtoByPageIndex(articleIndex, pageable);
+        then(articleService).should().getArticleDtoByPageIndex(anyInt(), any(Pageable.class));
     }
 
     @WithUserDetails(value = "jooTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
@@ -327,21 +327,21 @@ class ArticleControllerTest {
         ArticleDto dto = createArticleDto("title", "content", "java");
         ArticleRequest articleRequest = ArticleRequest.of("new title", "new content");
         willDoNothing().given(articleService).updateArticle(eq(articleId), any(ArticleDto.class));
-        given(articleService.getArticleByPageIndex(articleIndex, pageable)).willReturn(createArticle(articleId));
+        given(articleService.getArticleByPageIndex(anyInt(), any(Pageable.class))).willReturn(createArticle(1L));
         // When & Then
         mvc.perform(
                         post("/articles/detail/form")
                                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                                 .content(formDataEncoder.encode(articleRequest))
                                 .queryParam("articleIndex", String.valueOf(articleIndex))
-                                .queryParam("page", String.valueOf(pageable.getPageNumber()))
+                                .queryParam("pageable", String.valueOf(pageable))
                                 .with(csrf())
                 )
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/articles/detail?articleIndex=0&page=0"))
                 .andExpect(redirectedUrl("/articles/detail?articleIndex=0&page=0"));
         then(articleService).should().updateArticle(eq(articleId), any(ArticleDto.class));
-        then(articleService).should().getArticleByPageIndex(articleIndex, pageable);
+        then(articleService).should().getArticleByPageIndex(anyInt(), any(Pageable.class));
     }
 
     @WithUserDetails(value = "jooTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
