@@ -28,5 +28,25 @@ spring:
   data.rest:
       base-path: /api
       detection-strategy: annotated
-  thymeleaf3:
-    decoupled-logic: true
+  thymeleaf3.decoupled-logic: true
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            # REST API 키
+            client-id: ${KAKAO_OAUTH_CLIENT_ID}
+            # 보안 > Client Secret 코드
+            client-secret: ${KAKAO_OAUTH_CLIENT_SECRET}
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            client-authentication-method: POST
+        provider:
+          kakao:
+            # https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-code
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            # https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#request-token
+            token-uri: https://kauth.kakao.com/oauth/token
+            # https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#req-user-info
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
