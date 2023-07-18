@@ -11,7 +11,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("DTO - Kakao OAuth 2.0 인증 응답 데이터 테스트")
 class KakaoOauth2ResponseTest {

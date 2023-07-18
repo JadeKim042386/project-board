@@ -1,8 +1,6 @@
 package com.spring.projectboard.config;
 
-import com.spring.projectboard.domain.UserAccount;
 import com.spring.projectboard.dto.UserAccountDto;
-import com.spring.projectboard.repository.UserAccountRepository;
 import com.spring.projectboard.service.UserAccountService;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
