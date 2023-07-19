@@ -22,6 +22,9 @@ repositories {
 }
 
 dependencies {
+	implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
+	implementation 'org.springdoc:springdoc-openapi-data-rest:1.7.0'
+	implementation 'org.springdoc:springdoc-openapi-javadoc:1.7.0'
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
@@ -52,6 +55,7 @@ dependencies {
 	implementation("com.querydsl:querydsl-jpa")
 	implementation('com.querydsl:querydsl-core')
 	implementation('com.querydsl:querydsl-collections')
+	annotationProcessor('com.github.therapi:therapi-runtime-javadoc-scribe:0.15.0')
 	annotationProcessor("com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa")
 	annotationProcessor('jakarta.annotation:jakarta.annotation-api')
 	annotationProcessor('jakarta.persistence:jakarta.persistence-api')

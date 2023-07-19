@@ -49,6 +49,8 @@ spring:
             # https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#req-user-info
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
+springdoc.swagger-ui.path: /swagger-ui
+
 
 ---
 
