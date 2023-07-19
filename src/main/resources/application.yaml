@@ -49,3 +49,9 @@ spring:
             # https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api#req-user-info
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
+
+---
+
+spring:
+  config.activate.on-profile: test
+  datasource.url: jdbc:h2:mem:testdb
