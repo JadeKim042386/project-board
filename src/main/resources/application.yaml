@@ -33,6 +33,10 @@ spring:
       client:
         registration:
           kakao:
+            # REST API 키
+            client-id: ${KAKAO_OAUTH_CLIENT_ID}
+            # 보안 > Client Secret 코드
+            client-secret: ${KAKAO_OAUTH_CLIENT_SECRET}
             authorization-grant-type: authorization_code
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
             client-authentication-method: POST
