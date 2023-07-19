@@ -11,10 +11,9 @@ logging:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/board
-    username: joo
-#    password: thisisTestpw!!
-#    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${LOCAL_DB_URL}
+    username: ${LOCAL_DB_USERNAME}
+    password: ${LOCAL_DB_PASSWORD}
   jpa:
     open-in-view: false
     defer-datasource-initialization: true # test에 사용될 *.sql을 사용할 수 있게 함
@@ -34,10 +33,6 @@ spring:
       client:
         registration:
           kakao:
-            # REST API 키
-            client-id: ${KAKAO_OAUTH_CLIENT_ID}
-            # 보안 > Client Secret 코드
-            client-secret: ${KAKAO_OAUTH_CLIENT_SECRET}
             authorization-grant-type: authorization_code
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
             client-authentication-method: POST
