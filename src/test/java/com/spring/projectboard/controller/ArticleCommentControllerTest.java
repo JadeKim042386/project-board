@@ -1,6 +1,9 @@
 package com.spring.projectboard.controller;
 
 import com.spring.projectboard.config.TestSecurityConfig;
+import com.spring.projectboard.domain.Article;
+import com.spring.projectboard.domain.ArticleComment;
+import com.spring.projectboard.domain.UserAccount;
 import com.spring.projectboard.dto.ArticleCommentDto;
 import com.spring.projectboard.request.ArticleCommentRequest;
 import com.spring.projectboard.service.ArticleCommentService;
@@ -20,8 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.BDDMockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -47,9 +49,10 @@ class ArticleCommentControllerTest {
         // Given
         long articleId = 1L;
         int articleIndex = 0;
+        long articleCommentId = 1L;
         Pageable pageable = Pageable.ofSize(10);
         ArticleCommentRequest request = ArticleCommentRequest.of(articleId, "test comment");
-        willDoNothing().given(articleCommentService).saveComment(any(ArticleCommentDto.class));
+        given(articleCommentService.saveComment(any(ArticleCommentDto.class))).willReturn(articleCommentId);
         // When & Then
         mvc.perform(
                         post("/comments/new")
@@ -60,8 +63,8 @@ class ArticleCommentControllerTest {
                                 .with(csrf())
                 )
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/articles/detail?articleIndex=0&page=0"))
-                .andExpect(redirectedUrl("/articles/detail?articleIndex=0&page=0"));
+                .andExpect(view().name("redirect:/articles/detail?articleIndex=0&page=0#comment" + articleCommentId))
+                .andExpect(redirectedUrl("/articles/detail?articleIndex=0&page=0#comment" + articleCommentId));
         then(articleCommentService).should().saveComment(any(ArticleCommentDto.class));
     }
 
@@ -94,8 +97,9 @@ class ArticleCommentControllerTest {
         // Given
         long articleId = 1L;
         long parentCommentId = 1L;
+        long articleCommentId = 1L;
         ArticleCommentRequest request = ArticleCommentRequest.of(articleId, parentCommentId, "test content");
-        willDoNothing().given(articleCommentService).saveComment(any(ArticleCommentDto.class));
+        given(articleCommentService.saveComment(any(ArticleCommentDto.class))).willReturn(articleCommentId);
         // When & Then
         mvc.perform(
                 post("/comments/new")
@@ -106,8 +110,8 @@ class ArticleCommentControllerTest {
                         .with(csrf())
             )
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/articles/detail?articleIndex=0&page=0"))
-                .andExpect(redirectedUrl("/articles/detail?articleIndex=0&page=0"));
+                .andExpect(view().name("redirect:/articles/detail?articleIndex=0&page=0#comment" + articleCommentId))
+                .andExpect(redirectedUrl("/articles/detail?articleIndex=0&page=0#comment" + articleCommentId));
         then(articleCommentService).should().saveComment(any(ArticleCommentDto.class));
     }
 }
