@@ -52,12 +52,14 @@ class ArticleCommentServiceTest {
     void saveComment() {
         // Given
         ArticleCommentDto dto = createCommentDto("content");
+        ArticleComment articleComment = createComment("content");
         given(articleRepository.getReferenceById(dto.articleId())).willReturn(createArticle());
-        given(articleCommentRepository.save(any(ArticleComment.class))).willReturn(createComment("content"));
+        given(articleCommentRepository.save(any(ArticleComment.class))).willReturn(articleComment);
         given(userAccountRepository.getReferenceById(dto.userAccountDto().userId())).willReturn(createUserAccount());
         // When
-        sut.saveComment(dto);
+        Long savedCommentId = sut.saveComment(dto);
         // Then
+        assertThat(savedCommentId).isEqualTo(articleComment.getId());
         then(articleRepository).should().getReferenceById(dto.articleId());
         then(articleCommentRepository).should().save(any(ArticleComment.class));
         then(userAccountRepository).should().getReferenceById(dto.userAccountDto().userId());

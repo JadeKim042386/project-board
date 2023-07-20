@@ -1,5 +1,6 @@
 package com.spring.projectboard.controller;
 
+import com.spring.projectboard.domain.ArticleComment;
 import com.spring.projectboard.dto.security.BoardPrincipal;
 import com.spring.projectboard.request.ArticleCommentRequest;
 import com.spring.projectboard.service.ArticleCommentService;
@@ -29,13 +30,13 @@ public class ArticleCommentController {
             @RequestParam int articleIndex,
             @PageableDefault(size=10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             @AuthenticationPrincipal BoardPrincipal boardPrincipal) {
-        articleCommentService.saveComment(articleCommentRequest.toDto(boardPrincipal.toDto()));
+        Long articleCommentId = articleCommentService.saveComment(articleCommentRequest.toDto(boardPrincipal.toDto()));
 
         return UriComponentsBuilder.newInstance()
                 .path("redirect:/articles/detail")
                 .queryParam("articleIndex", articleIndex)
                 .queryParam("page", pageable.getPageNumber())
-                .build().toUriString();
+                .build().toUriString() + "#comment" + articleCommentId;
     }
 
     @PostMapping("{commentId}/delete")
