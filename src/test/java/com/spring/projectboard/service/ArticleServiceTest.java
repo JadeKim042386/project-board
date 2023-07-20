@@ -5,8 +5,6 @@ import com.spring.projectboard.domain.Hashtag;
 import com.spring.projectboard.domain.UserAccount;
 import com.spring.projectboard.domain.constant.SearchType;
 import com.spring.projectboard.dto.ArticleDto;
-import com.spring.projectboard.dto.ArticleWithCommentsDto;
-import com.spring.projectboard.dto.HashtagDto;
 import com.spring.projectboard.dto.UserAccountDto;
 import com.spring.projectboard.repository.ArticleRepository;
 import com.spring.projectboard.repository.HashtagRepository;
@@ -25,9 +23,7 @@ import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -111,28 +107,7 @@ class ArticleServiceTest {
         then(articleRepository).should().findByHashtagNames(Set.of(hashtagName), pageable);
     }
 
-    @DisplayName("ID로 댓글 달린 게시글 조회")
-    @Test
-    void findArticleWithComments() {
-        // Given
-        Long articleId = 1L;
-        Article article = createArticle();
-        given(articleRepository.findById(articleId)).willReturn(Optional.of(article));
-        // When
-        ArticleWithCommentsDto dto = sut.getArticleWithCommentsDto(articleId);
-        // Then
-        assertThat(dto)
-                .hasFieldOrPropertyWithValue("title", article.getTitle())
-                .hasFieldOrPropertyWithValue("content", article.getContent())
-                .hasFieldOrPropertyWithValue("hashtagDtos", article.getHashtags().stream()
-                        .map(HashtagDto::from)
-                        .collect(Collectors.toUnmodifiableSet())
-                );
-
-        then(articleRepository).should().findById(articleId);
-    }
-
-    @DisplayName("Page와 Index로 댓글 달린 게시글 조회")
+    @DisplayName("Page와 Index로 게시글 조회")
     @Test
     void findArticleWithCommentsByPageIndex() {
         // Given
@@ -144,62 +119,51 @@ class ArticleServiceTest {
         Article article = createArticle();
         given(articleRepository.findAll(pageable)).willReturn(new PageImpl(List.of(article), pageable, 1));
         // When
-        ArticleWithCommentsDto dto = sut.getArticleWithCommentsDtoByPageIndex(articleIndex, pageable);
+        Article result = sut.getArticleByPageIndex(articleIndex, pageable);
         // Then
-        assertThat(dto)
+        assertThat(result)
                 .hasFieldOrPropertyWithValue("title", article.getTitle())
                 .hasFieldOrPropertyWithValue("content", article.getContent())
-                .hasFieldOrPropertyWithValue("hashtagDtos", article.getHashtags().stream()
-                        .map(HashtagDto::from)
-                        .collect(Collectors.toUnmodifiableSet())
-                );
+                .hasFieldOrPropertyWithValue("hashtags", article.getHashtags());
 
         then(articleRepository).should().findAll(pageable);
     }
 
-    @DisplayName("[예외] ID로 존재하지 않는 댓글 달린 게시글 조회")
+    @DisplayName("[예외] Page와 Index로 존재하지 않는 댓글 달린 게시글 조회")
     @Test
     void findNotExistArticleWithComments() {
         // Given
-        Long articleId = 0L;
-        given(articleRepository.findById(articleId)).willReturn(Optional.empty());
-        // When
-
-        // Then
-        assertThatThrownBy(() -> sut.getArticleWithCommentsDto(articleId)).isInstanceOf(EntityNotFoundException.class);
-        then(articleRepository).should().findById(articleId);
-    }
-
-    @DisplayName("ID로 게시글 조회")
-    @Test
-    void findArticle() {
-        // Given
-        Long article_id = 1L;
+        int articleIndex = 1;
+        int pageNumber = 0;
+        int pageSize = 10;
+        String sortName = "createdAt";
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, sortName));
         Article article = createArticle();
-        given(articleRepository.findById(article_id)).willReturn(Optional.of(article));
-        // When
-        ArticleDto dto = sut.getArticle(article_id);
-        // Then
-        assertThat(dto)
-                .hasFieldOrPropertyWithValue("title", article.getTitle())
-                .hasFieldOrPropertyWithValue("content", article.getContent())
-                .hasFieldOrPropertyWithValue("hashtagDtos", article.getHashtags().stream()
-                        .map(HashtagDto::from)
-                        .collect(Collectors.toUnmodifiableSet())
-                );
-
-        then(articleRepository).should().findById(article_id);
+        given(articleRepository.findAll(pageable)).willReturn(new PageImpl(List.of(article), pageable, 1));
+        // When & Then
+        assertThatThrownBy(() -> sut
+                .getArticleWithCommentsDtoByPageIndex(articleIndex, pageable))
+                .isInstanceOf(EntityNotFoundException.class);
+        then(articleRepository).should().findAll(pageable);
     }
 
-    @DisplayName("[예외] ID로 없는 게시글 조회")
+
+    @DisplayName("[예외] Page와 Index로 없는 게시글 조회")
     @Test
     void findNotExistArticle() {
         // Given
-        Long article_id = 0L;
-        given(articleRepository.findById(article_id)).willReturn(Optional.empty());
+        int articleIndex = 1;
+        int pageNumber = 0;
+        int pageSize = 10;
+        String sortName = "createdAt";
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, sortName));
+        Article article = createArticle();
+        given(articleRepository.findAll(pageable)).willReturn(new PageImpl(List.of(article), pageable, 1));
         // When & Then
-        assertThatThrownBy(() -> sut.getArticle(article_id)).isInstanceOf(EntityNotFoundException.class);
-        then(articleRepository).should().findById(article_id);
+        assertThatThrownBy(() -> sut
+                .getArticleDtoByPageIndex(articleIndex, pageable))
+                .isInstanceOf(EntityNotFoundException.class);
+        then(articleRepository).should().findAll(pageable);
     }
 
     @DisplayName("본문에서 해시태그를 추출하여 해시태그가 포함된 게시글을 저장")

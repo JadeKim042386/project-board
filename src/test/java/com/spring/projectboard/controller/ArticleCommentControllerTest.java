@@ -1,9 +1,6 @@
 package com.spring.projectboard.controller;
 
 import com.spring.projectboard.config.TestSecurityConfig;
-import com.spring.projectboard.domain.Article;
-import com.spring.projectboard.domain.ArticleComment;
-import com.spring.projectboard.domain.UserAccount;
 import com.spring.projectboard.dto.ArticleCommentDto;
 import com.spring.projectboard.request.ArticleCommentRequest;
 import com.spring.projectboard.service.ArticleCommentService;

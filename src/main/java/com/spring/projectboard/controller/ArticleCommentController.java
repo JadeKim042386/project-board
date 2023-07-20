@@ -1,6 +1,5 @@
 package com.spring.projectboard.controller;
 
-import com.spring.projectboard.domain.ArticleComment;
 import com.spring.projectboard.dto.security.BoardPrincipal;
 import com.spring.projectboard.request.ArticleCommentRequest;
 import com.spring.projectboard.service.ArticleCommentService;
