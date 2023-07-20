@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thlogic>
+    <attr sel="#login" th:onclick="|location.href = '@{/login}'|" th:method="post" />
+    <attr sel="#login-error" th:if="${param.error}">
+        <attr sel="p" th:text="ID와 비밀번호를 다시 입력해주세요." />
+    </attr>
+    <attr sel="#kakao-login" sec:authorize="!isAuthenticated()" th:onclick="|location.href = '@{/oauth2/authorization/kakao}'|" />
+</thlogic>
