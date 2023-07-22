@@ -18,16 +18,6 @@ public class ArticleRepositoryCustomImpl extends QuerydslRepositorySupport imple
     }
 
     @Override
-    public List<String> findAllDistinctHashtags() {
-        QArticle article = QArticle.article;
-
-        return from(article)
-                .distinct()
-                .select(article.hashtags.any().hashtagName)
-                .fetch();
-    }
-
-    @Override
     public Page<Article> findByHashtagNames(Collection<String> hashtagNames, Pageable pageable) {
         QHashtag hashtag = QHashtag.hashtag;
         QArticle article = QArticle.article;
