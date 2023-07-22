@@ -35,7 +35,7 @@ public class ArticleCommentService {
     /**
      * 부모 댓글 ID가 존재하면 자식 댓글이므로 부모 댓글의 자식 댓글 collection 에 추가, null 이면 부모 댓글 추가
      */
-    public void saveComment(ArticleCommentDto dto) {
+    public Long saveComment(ArticleCommentDto dto) {
         try{
             Article article = articleRepository.getReferenceById(dto.articleId());
             UserAccount userAccount = userAccountRepository.getReferenceById(dto.userAccountDto().userId());
@@ -46,9 +46,10 @@ public class ArticleCommentService {
             } else {
                 articleCommentRepository.save(articleComment);
             }
-
+            return articleComment.getId();
         } catch (EntityNotFoundException e) {
             log.warn("댓글 저장 실패! 댓글 작성에 필요한 정보를 찾을 수 없습니다. - {}", e);
+            return null;
         }
     }
 

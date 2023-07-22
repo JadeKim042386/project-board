@@ -43,37 +43,21 @@ public class ArticleService {
         };
     }
 
-    @Deprecated
-    @Transactional(readOnly = true)
-    public ArticleDto getArticle(Long articleId) {
-        return articleRepository.findById(articleId)
-                .map(ArticleDto::from)
-                .orElseThrow(() -> new EntityNotFoundException("게시글이 없습니다 - articleId: " + articleId));
-    }
-
     @Transactional(readOnly = true)
     public ArticleDto getArticleDtoByPageIndex(int articleIndex, Pageable pageable) {
         try {
             return ArticleDto.from(getArticleByPageIndex(articleIndex, pageable));
-        } catch (EntityNotFoundException e) {
-            throw e;
+        } catch (IndexOutOfBoundsException e) {
+            throw new EntityNotFoundException(e.getMessage());
         }
-    }
-
-    @Deprecated
-    @Transactional(readOnly = true)
-    public ArticleWithCommentsDto getArticleWithCommentsDto(Long articleId){
-        return articleRepository.findById(articleId)
-                .map(ArticleWithCommentsDto::from)
-                .orElseThrow(() -> new EntityNotFoundException("게시글이 없습니다 - articleId: " + articleId));
     }
 
     @Transactional(readOnly = true)
     public ArticleWithCommentsDto getArticleWithCommentsDtoByPageIndex(int articleIndex, Pageable pageable) {
         try {
             return ArticleWithCommentsDto.from(getArticleByPageIndex(articleIndex, pageable));
-        } catch (EntityNotFoundException e) {
-            throw e;
+        } catch (IndexOutOfBoundsException e) {
+            throw new EntityNotFoundException(e.getMessage());
         }
     }
 
